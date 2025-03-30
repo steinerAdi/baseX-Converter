@@ -1,0 +1,11 @@
+# Output
+test_baseX-lib
+
+# Unity Tests
+coverage_report
+*.info
+*.gcda
+*.gcno
+
+# VS-Code
+.vscode
