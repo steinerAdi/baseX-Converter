@@ -73,7 +73,6 @@ baseX_returnType base8_encodeBytes(
     for (uint8_t i = 0; i < (2 + (carryLength ? 1 : 0)); i++) {
       uint8_t newBase8Number = carry >> (16 - BASE_BIT_LENGTH);
       numberOfBits += baseNumberOfBits[newBase8Number];
-      printf("Number of bits for %x => %u\n", newBase8Number, numberOfBits);
       encodedString[outPos] = newBase8Number + '1';
       outPos++;
       carry = (carry << BASE_BIT_LENGTH);
@@ -84,11 +83,9 @@ baseX_returnType base8_encodeBytes(
       carryLength--;
     }
   }
-  printf("Number of bits %u with check bits %u\n", numberOfBits, checkBits);
   // Add one additional number with checkBits
   if (checkBits) {
     encodedString[outPos] = (carry >> (16 - BASE_BIT_LENGTH)) + (numberOfBits % (2 * checkBits)) + '1';
-    printf("End carry => %x => num %u\n", carry, (carry >> (16 - BASE_BIT_LENGTH)));
     outPos++;
   }
   encodedString[outPos] = '\0';
