@@ -4,8 +4,8 @@ LDFLAGS= \
 -I../unity\
 -I../lib 
 
-SRC=../lib/tinytime.c ../unity/unity.c
-TEST=test_tinyTimeLib.c
+SRC=../lib/base8_converter.c ../unity/unity.c
+TEST=test_baseXLib.c
 OUT=test_baseXLib
 
 all: build

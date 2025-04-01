@@ -34,12 +34,13 @@ typedef enum {
   BASEX_OK = 0,
   BASEX_ARGUMENTS,
   BASEX_OVERFLOW,
+  BASEX_SRCERROR,
   BASEX_ERROR
 } baseX_returnType;
 
 baseX_returnType base8_encodeBytes(
-    uint8_t *converter,
-    uint32_t convertedSize,
+    uint8_t *encodedString,
+    uint32_t encodedStringSize,
     const uint8_t *srcBytes,
     uint32_t srcBytesSize);
 

@@ -1,0 +1,140 @@
+/**
+ * @file base8_converter.h
+ * @author Adrian STEINER (steia19@bfh.ch)
+ * @brief Base 8 byte converter
+ * @version 0.1
+ * @date 30-03-2025
+ *
+ * @copyright (C) 2025 Adrian STEINER
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
+ *
+ */
+
+#include "baseX_converter.h"
+#include <string.h>
+
+#define BASE_BIT_LENGTH (3)
+#define BYTE_BIT_LENGTH (8)
+
+uint8_t carryToAscii(uint16_t carry);
+
+baseX_returnType base8_encodeBytes(
+    uint8_t *encodedString,
+    uint32_t encodedStringSize,
+    const uint8_t *srcBytes,
+    uint32_t srcBytesSize) {
+  if (NULL == encodedString || NULL == srcBytes) {
+    return BASEX_ARGUMENTS;
+  }
+
+  // Check needed length
+  uint32_t outputLength = srcBytesSize * BYTE_BIT_LENGTH / BASE_BIT_LENGTH;
+
+  uint8_t checkBits = (srcBytesSize * BYTE_BIT_LENGTH) % BASE_BIT_LENGTH;
+  if (checkBits) {
+    outputLength++;
+  }
+  // Check overflow
+  if (outputLength >= encodedStringSize) {
+    return BASEX_OVERFLOW;
+  }
+
+  uint16_t carry = 0;
+  uint16_t carryLength = 0;
+  uint32_t numberOfBits = 0;
+
+  uint32_t outPos = 0;
+
+  for (uint32_t srcPos = 0; srcPos < srcBytesSize; srcPos++) {
+    carry += ((((uint16_t)srcBytes[srcPos]) & UINT8_MAX) << (BYTE_BIT_LENGTH - carryLength));
+    for (uint8_t i = 0; i < (2 + (carryLength ? 1 : 0)); i++) {
+      encodedString[outPos] = carryToAscii(carry);
+      outPos++;
+      carry = (carry << BASE_BIT_LENGTH);
+    }
+    if (0 == carryLength) {
+      carryLength = 2;
+    } else {
+      carryLength--;
+    }
+  }
+
+  // Add one additional number with checkBits
+  if (checkBits) {
+    carry += (uint16_t)(numberOfBits % (2 * checkBits)) << (15 - checkBits);
+    encodedString[outPos] = carryToAscii(carry);
+    outPos++;
+  }
+  encodedString[outPos] = '\0';
+  return BASEX_OK;
+}
+
+baseX_returnType base8_decodeString(
+    uint8_t *decodedBytes,
+    uint32_t decodedBytesSize,
+    const uint8_t *srcString) {
+
+  if (NULL == srcString) {
+    return BASEX_ARGUMENTS;
+  }
+
+  uint32_t srcLength = strlen((const char *)srcString);
+  for (uint32_t i = 0; i < srcLength; i++) {
+    ;
+  }
+  return BASEX_OK;
+}
+
+baseX_returnType base8_decodeNum(
+    uint8_t *decodedBytes,
+    uint32_t decodedBytesSize,
+    const uint8_t *srcNumbers,
+    const uint32_t srcLength) {
+
+  if (NULL == decodedBytes || NULL == srcNumbers) {
+    return BASEX_ARGUMENTS;
+  }
+
+  uint32_t outputLength = srcLength * BYTE_BIT_LENGTH / BASE_BIT_LENGTH;
+  if (outputLength > decodedBytesSize) {
+    return BASEX_OVERFLOW;
+  }
+
+  // Run algorithm
+
+  // uint32_t srcPos = 0;
+  // uint32_t outPos = 0;
+
+  // uint16_t carry = 0;
+  // uint8_t carryLength = 0;
+
+  // for (; outPos < outputLength; outPos++) {
+  //   for (uint8_t i = 0; i < (3 - carryLength / 2); i++, srcPos++) {
+  //     carry = carry << 3;
+  //     if (srcPos < outputLength) {
+  //       carry |= (srcNumbers[srcPos] & 0x07);
+  //     }
+  //   }
+  //   carryLength = (carryLength + 1) % 3;
+  //   decodedBytes[outPos] = (carry >> carryLength);
+  //   carry &= (0x3 >> (2 - carryLength));
+  // }
+
+  return BASEX_OK;
+}
+
+uint8_t carryToAscii(uint16_t carry) {
+  uint8_t number = (carry >> 13);
+  return number + '1';
+}

@@ -21,11 +21,68 @@
  *
  */
 
+#include "baseX_converter.h"
 #include "unity.h"
 #include <string.h>
 
+void setUp(void) {
+} // Empty needed definition
+void tearDown(void) {
+} // Empty needed definition
+
+#define BYTESTREAM_SIZE (32)
+#define BUFFER_SIZE (3 * BYTESTREAM_SIZE)
+
+struct {
+  uint8_t byteStream[BYTESTREAM_SIZE];
+  uint32_t length;
+  uint8_t base8String[BUFFER_SIZE];
+  uint8_t base8Num[BUFFER_SIZE];
+} base8Data[] = {
+    {.byteStream = {0x00},
+        .length = 1,
+        .base8String = "111",
+        .base8Num = {0, 0, 0}},
+    {.byteStream = {0x3F},
+        .length = 1,
+        .base8String = "287",
+        .base8Num = {1, 7, 6}},
+    {.byteStream = {0xA5, 0xB3},
+        .length = 2,
+        .base8String = "62448",
+        .base8Num = {5, 1, 3, 3, 7}},
+    {.byteStream = {0x42, 0x81, 0x7F, 0x11, 0x0A, 0xB8, 0x65},
+        .length = 5,
+        .base8String = "287",
+        .base8Num = {2, 0, 5, 0, 0, 5, 7, 7, 0, 4, 2, 0, 2, 5, 6, 0, 6, 2, 5}},
+    {.byteStream = {0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF, 0x11, 0x22, 0x33},
+        .length = 5,
+        .base8String = "287",
+        .base8Num = {5, 2, 5, 5, 7, 3, 4, 6, 7, 5, 7, 6, 7, 7, 7, 0, 4, 2, 2, 1, 0, 4, 1, 6, 6, 0}},
+    {.byteStream = {0xF3, 0xE7, 0xD1, 0xA4, 0x5B, 0x92, 0x3C, 0xEF, 0x01, 0x7A, 0xA9, 0x4D, 0x82, 0xC7, 0x5F, 0x3B, 0xD4, 0x9E, 0x8A, 0x6F, 0xB1, 0xC0, 0xFA, 0x27, 0x13, 0x99, 0xE8, 0x4C, 0x21, 0x7D, 0x5A},
+        .length = 5,
+        .base8String = "287",
+        .base8Num = {}},
+};
+
+void test_fail_base8_encode(void) {
+  uint8_t buf[BUFFER_SIZE];
+  TEST_ASSERT_EQUAL_INT(BASEX_ARGUMENTS, base8_encodeBytes(NULL, 0, buf, 0));
+  TEST_ASSERT_EQUAL_INT(BASEX_ARGUMENTS, base8_encodeBytes(buf, 0, NULL, 0));
+}
+
+void test_base8_encode(void) {
+  uint8_t buf[BUFFER_SIZE];
+
+  for (uint32_t i = 0; i < sizeof(base8Data) / sizeof(base8Data[0]); i++) {
+    TEST_ASSERT_EQUAL_INT(BASEX_OK, base8_encodeBytes(buf, BUFFER_SIZE, base8Data[i].byteStream, base8Data[i].length));
+    TEST_ASSERT_EQUAL_UINT8_ARRAY(base8Data[i].base8String, buf, strlen((const char *)buf));
+  }
+}
+
 int main(void) {
   UNITY_BEGIN();
-  // RUN_TEST(test_isLeapYear);
+  RUN_TEST(test_fail_base8_encode);
+  RUN_TEST(test_base8_encode);
   return UNITY_END();
 }
