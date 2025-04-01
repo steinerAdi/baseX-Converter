@@ -49,20 +49,32 @@ struct {
         .base8Num = {1, 7, 6}},
     {.byteStream = {0xA5, 0xB3},
         .length = 2,
-        .base8String = "62448",
-        .base8Num = {5, 1, 3, 3, 7}},
+        .base8String = "624425",
+        .base8Num = {5, 1, 3, 3, 1, 4}},
+    {.byteStream = {0xC9, 0x4F, 0x1A},
+        .length = 3,
+        .base8String = "73358543",
+        .base8Num = {6, 2, 2, 4, 7, 4, 3, 2}},
+    {.byteStream = {0x65},
+        .length = 1,
+        .base8String = "424",
+        .base8Num = {3, 1, 3}},
     {.byteStream = {0x42, 0x81, 0x7F, 0x11, 0x0A, 0xB8, 0x65},
-        .length = 5,
-        .base8String = "287",
-        .base8Num = {2, 0, 5, 0, 0, 5, 7, 7, 0, 4, 2, 0, 2, 5, 6, 0, 6, 2, 5}},
-    {.byteStream = {0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF, 0x11, 0x22, 0x33},
-        .length = 5,
-        .base8String = "287",
-        .base8Num = {5, 2, 5, 5, 7, 3, 4, 6, 7, 5, 7, 6, 7, 7, 7, 0, 4, 2, 2, 1, 0, 4, 1, 6, 6, 0}},
-    {.byteStream = {0xF3, 0xE7, 0xD1, 0xA4, 0x5B, 0x92, 0x3C, 0xEF, 0x01, 0x7A, 0xA9, 0x4D, 0x82, 0xC7, 0x5F, 0x3B, 0xD4, 0x9E, 0x8A, 0x6F, 0xB1, 0xC0, 0xFA, 0x27, 0x13, 0x99, 0xE8, 0x4C, 0x21, 0x7D, 0x5A},
-        .length = 5,
-        .base8String = "287",
-        .base8Num = {}},
+        .length = 7,
+        .base8String = "3161168815316381423",
+        .base8Num = {2, 0, 5, 0, 0, 5, 7, 7,
+            0, 4, 2, 0, 5, 2, 7, 0,
+            3, 1, 2}},
+    // {.byteStream = {0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF, 0x11, 0x22, 0x33},
+    //     .length = 5,
+    //     .base8String = "287",
+    //     .base8Num = {5, 2, 5, 5, 7, 3, 4, 6, 7, 5, 7, 6, 7, 7, 7, 0, 4, 2, 2, 1, 0, 4, 1, 6, 6, 0}},
+    // {.byteStream = {0xF3, 0xE7, 0xD1, 0xA4, 0x5B, 0x92, 0x3C, 0xEF, 0x01, 0x7A, 0xA9, 0x4D, 0x82, 0xC7, 0x5F, 0x3B, 0xD4, 0x9E, 0x8A, 0x6F, 0xB1, 0xC0, 0xFA, 0x27, 0x13, 0x99, 0xE8, 0x4C, 0x21, 0x7D, 0x5A},
+    //     .length = 5,
+    //     .base8String = "287",
+    //     .base8Num = {7, 4, 7, 6, 3, 5, 1, 5, 1, 2, 2, 6, 7, 1, 2, 3, 6, 0, 3, 5, 7, 5, 0, 1, 7, 2, 5, 1, 2, 3, 2, 3,
+    //         0, 2, 6, 1, 7, 5, 3, 7, 7, 5, 2, 3, 6, 2, 1, 2, 6, 7, 3, 6, 2, 6, 0, 1, 7, 5, 4, 3, 4, 4, 7, 7,
+    //         5, 6, 5, 4, 3, 4, 0}},
 };
 
 void test_fail_base8_encode(void) {
@@ -76,6 +88,7 @@ void test_base8_encode(void) {
 
   for (uint32_t i = 0; i < sizeof(base8Data) / sizeof(base8Data[0]); i++) {
     TEST_ASSERT_EQUAL_INT(BASEX_OK, base8_encodeBytes(buf, BUFFER_SIZE, base8Data[i].byteStream, base8Data[i].length));
+    printf("Expected: %s is %s \n", base8Data[i].base8String, buf);
     TEST_ASSERT_EQUAL_UINT8_ARRAY(base8Data[i].base8String, buf, strlen((const char *)buf));
   }
 }

@@ -27,7 +27,19 @@
 #define BASE_BIT_LENGTH (3)
 #define BYTE_BIT_LENGTH (8)
 
-uint8_t carryToAscii(uint16_t carry);
+const uint8_t baseNumberOfBits[8] = {
+    0, // 000
+    1, // 001
+    1, // 010
+    2, // 011
+    1, // 100
+    2, // 101
+    2, // 110
+    3, // 111
+};
+
+uint8_t
+carryToAscii(uint16_t carry);
 
 baseX_returnType base8_encodeBytes(
     uint8_t *encodedString,
@@ -41,7 +53,7 @@ baseX_returnType base8_encodeBytes(
   // Check needed length
   uint32_t outputLength = srcBytesSize * BYTE_BIT_LENGTH / BASE_BIT_LENGTH;
 
-  uint8_t checkBits = (srcBytesSize * BYTE_BIT_LENGTH) % BASE_BIT_LENGTH;
+  uint8_t checkBits = (srcBytesSize) % BASE_BIT_LENGTH;
   if (checkBits) {
     outputLength++;
   }
@@ -59,7 +71,10 @@ baseX_returnType base8_encodeBytes(
   for (uint32_t srcPos = 0; srcPos < srcBytesSize; srcPos++) {
     carry += ((((uint16_t)srcBytes[srcPos]) & UINT8_MAX) << (BYTE_BIT_LENGTH - carryLength));
     for (uint8_t i = 0; i < (2 + (carryLength ? 1 : 0)); i++) {
-      encodedString[outPos] = carryToAscii(carry);
+      uint8_t newBase8Number = carry >> (16 - BASE_BIT_LENGTH);
+      numberOfBits += baseNumberOfBits[newBase8Number];
+      printf("Number of bits for %x => %u\n", newBase8Number, numberOfBits);
+      encodedString[outPos] = newBase8Number + '1';
       outPos++;
       carry = (carry << BASE_BIT_LENGTH);
     }
@@ -69,11 +84,11 @@ baseX_returnType base8_encodeBytes(
       carryLength--;
     }
   }
-
+  printf("Number of bits %u with check bits %u\n", numberOfBits, checkBits);
   // Add one additional number with checkBits
   if (checkBits) {
-    carry += (uint16_t)(numberOfBits % (2 * checkBits)) << (15 - checkBits);
-    encodedString[outPos] = carryToAscii(carry);
+    encodedString[outPos] = (carry >> (16 - BASE_BIT_LENGTH)) + (numberOfBits % (2 * checkBits)) + '1';
+    printf("End carry => %x => num %u\n", carry, (carry >> (16 - BASE_BIT_LENGTH)));
     outPos++;
   }
   encodedString[outPos] = '\0';
