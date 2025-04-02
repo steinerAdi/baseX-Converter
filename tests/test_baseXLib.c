@@ -91,7 +91,6 @@ void test_base8_encode(void) {
 
   for (uint32_t i = 0; i < sizeof(base8Data) / sizeof(base8Data[0]); i++) {
     TEST_ASSERT_EQUAL_INT(BASEX_OK, base8_encodeBytes(buf, BUFFER_SIZE, base8Data[i].byteStream, base8Data[i].length));
-    printf("Expected: %s is %s \n", base8Data[i].base8String, buf);
     TEST_ASSERT_EQUAL_UINT8_ARRAY(base8Data[i].base8String, buf, strlen((const char *)buf));
   }
 }

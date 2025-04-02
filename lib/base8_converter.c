@@ -110,39 +110,64 @@ baseX_returnType base8_decodeString(
 
 baseX_returnType base8_decodeNum(
     uint8_t *decodedBytes,
+    uint32_t *decodedLength,
     uint32_t decodedBytesSize,
     const uint8_t *srcNumbers,
     const uint32_t srcLength) {
+
+#define NO_CHECK_BYTES (8)
 
   if (NULL == decodedBytes || NULL == srcNumbers) {
     return BASEX_ARGUMENTS;
   }
 
-  uint32_t outputLength = srcLength * BYTE_BIT_LENGTH / BASE_BIT_LENGTH;
+  // Check allowed input length
+  if (0 != srcLength % NO_CHECK_BYTES || 0 != srcLength % BASE_BIT_LENGTH) {
+    return BASEX_SRCERROR;
+  }
+  // Set outputlength and check overflow
+
+  uint32_t outputLength = srcLength / BASE_BIT_LENGTH;
+
+  uint8_t checkBits = (srcLength % NO_CHECK_BYTES) / BASE_BIT_LENGTH;
+  // Set special case no checkBits results in one more character
+  if (!checkBits) {
+    outputLength++;
+  }
+
   if (outputLength > decodedBytesSize) {
     return BASEX_OVERFLOW;
   }
 
   // Run algorithm
 
-  // uint32_t srcPos = 0;
-  // uint32_t outPos = 0;
+  uint32_t srcPos = 0;
+  uint32_t outPos = 0;
 
-  // uint16_t carry = 0;
-  // uint8_t carryLength = 0;
+  uint16_t carry = 0;
+  uint8_t carryLength = 0;
+  uint32_t numberOfBits = 0;
+  uint8_t lastBitNumber = 0;
 
-  // for (; outPos < outputLength; outPos++) {
-  //   for (uint8_t i = 0; i < (3 - carryLength / 2); i++, srcPos++) {
-  //     carry = carry << 3;
-  //     if (srcPos < outputLength) {
-  //       carry |= (srcNumbers[srcPos] & 0x07);
-  //     }
-  //   }
-  //   carryLength = (carryLength + 1) % 3;
-  //   decodedBytes[outPos] = (carry >> carryLength);
-  //   carry &= (0x3 >> (2 - carryLength));
-  // }
+  for (; outPos < outputLength; outPos++) {
+    for (uint8_t i = 0; i < (3 - carryLength / 2); i++, srcPos++) {
+      carry = carry << 3;
+      lastBitNumber = (srcNumbers[srcPos] & 0x07);
+      numberOfBits = baseNumberOfBits[lastBitNumber];
+      carry |= lastBitNumber;
+    }
+    carryLength = (carryLength + 1) % 3;
+    decodedBytes[outPos] = (carry >> carryLength);
+    carry &= (0x3 >> (2 - carryLength));
+  }
+  *decodedLength = outputLength;
 
+  if (checkBits) {
+    lastBitNumber -= baseNumberOfBits[lastBitNumber];
+    if (carry != numberOfBits % (2 * carryLength)) {
+      return BASEX_SRCERROR;
+    }
+  }
   return BASEX_OK;
 }
 

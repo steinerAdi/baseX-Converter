@@ -51,6 +51,7 @@ baseX_returnType base8_decodeString(
 
 baseX_returnType base8_decodeNum(
     uint8_t *decodedBytes,
+    uint32_t *decodedLength,
     uint32_t decodedBytesSize,
     const uint8_t *srcNumbers,
     const uint32_t srcLength);
