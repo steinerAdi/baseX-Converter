@@ -36,7 +36,7 @@ void tearDown(void) {
 struct {
   uint8_t byteStream[BYTESTREAM_SIZE];
   uint32_t length;
-  uint8_t base8String[BUFFER_SIZE];
+  char base8String[BUFFER_SIZE];
   uint8_t base8Num[BUFFER_SIZE];
 } base8Data[] = {
     {.byteStream = {0x00},
@@ -77,8 +77,8 @@ struct {
 
 void test_fail_base8_encode(void) {
   uint8_t buf[BUFFER_SIZE];
-  TEST_ASSERT_EQUAL_INT(BASEX_ARGUMENTS, base8_encodeBytes(NULL, 0, buf, 0));
   TEST_ASSERT_EQUAL_INT(BASEX_ARGUMENTS, base8_encodeBytes(buf, 0, NULL, 0));
+  TEST_ASSERT_EQUAL_INT(BASEX_ARGUMENTS, base8_encodeBytes(NULL, 0, buf, 0));
   TEST_ASSERT_EQUAL_INT(BASEX_OVERFLOW, base8_encodeBytes(buf, 0, buf, 1));
 }
 
@@ -91,23 +91,31 @@ void test_base8_encode(void) {
   }
 }
 
-test_fail_base8_decodeNum(void) {
+void test_fail_base8_decodeNum(void) {
   uint8_t buf[BUFFER_SIZE];
   uint32_t decodedLength = 0;
-  TEST_ASSERT_EQUAL_INT(BASEX_ARGUMENTS, base8_decodeNum(NULL, &decodedLength, BUFFER_SIZE, buf, BUFFER_SIZE));
-  TEST_ASSERT_EQUAL_INT(BASEX_ARGUMENTS, base8_decodeNum(buf, NULL, 0, NULL, 0));
+  TEST_ASSERT_EQUAL_INT(BASEX_ARGUMENTS, base8_decodeNum(buf, &decodedLength, BUFFER_SIZE, NULL, BUFFER_SIZE));
+  TEST_ASSERT_EQUAL_INT(BASEX_ARGUMENTS, base8_decodeNum(NULL, &decodedLength, 0, buf, 0));
+  TEST_ASSERT_EQUAL_INT(BASEX_ARGUMENTS, base8_decodeNum(buf, NULL, 0, buf, 0));
   TEST_ASSERT_EQUAL_INT(BASEX_OVERFLOW, base8_decodeNum(buf, &decodedLength, 1, buf, 16));
   TEST_ASSERT_EQUAL_INT(BASEX_SRCERROR, base8_decodeNum(buf, &decodedLength, 2, buf, 9)); // Not enough || to much src bytes
 }
 
-test_base8_decodeNum(void) {
+void test_base8_decodeNum(void) {
   uint8_t buf[BUFFER_SIZE];
   uint32_t decodedLength = 0;
 
   for (uint32_t i = 0; i < sizeof(base8Data) / sizeof(base8Data[0]); i++) {
-    TEST_ASSERT_EQUAL_INT(BASEX_OK, base8_decodeNum(buf, &decodedLength, BUFFER_SIZE, base8Data[i].base8Num, strlen(base8Data[i].base8String)));
+    TEST_ASSERT_EQUAL_INT((int)BASEX_OK, (int)base8_decodeNum(buf, &decodedLength, BUFFER_SIZE, base8Data[i].base8Num, strlen((const char *)base8Data[i].base8String)));
     TEST_ASSERT_EQUAL_UINT8_ARRAY(base8Data[i].byteStream, buf, decodedLength);
   }
+}
+
+void test_fail_base8_stringToNum(void) {
+  uint8_t buf[BUFFER_SIZE];
+  TEST_ASSERT_EQUAL_INT(BASEX_ARGUMENTS, base8_stringToNum(NULL, "0"));
+  TEST_ASSERT_EQUAL_INT(BASEX_ARGUMENTS, base8_stringToNum(buf, NULL));
+  TEST_ASSERT_EQUAL_INT(BASEX_SRCERROR, base8_stringToNum(buf, "0"));
 }
 
 void test_base8_stringToNum(void) {
@@ -124,6 +132,7 @@ int main(void) {
   RUN_TEST(test_base8_encode);
   RUN_TEST(test_fail_base8_decodeNum);
   RUN_TEST(test_base8_decodeNum);
+  RUN_TEST(test_fail_base8_stringToNum);
   RUN_TEST(test_base8_stringToNum);
   return UNITY_END();
 }

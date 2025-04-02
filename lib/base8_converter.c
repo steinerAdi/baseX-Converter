@@ -92,7 +92,7 @@ baseX_returnType base8_encodeBytes(
 
 baseX_returnType base8_stringToNum(
     uint8_t *number,
-    const uint8_t *srcString) {
+    const char *srcString) {
 #define MAX_CHARACTER ('8')
   if (NULL == number || NULL == srcString) {
     return BASEX_ARGUMENTS;
@@ -101,7 +101,7 @@ baseX_returnType base8_stringToNum(
     if (srcString[i] < BASE8_STARTNUM || srcString[i] > MAX_CHARACTER) {
       return BASEX_SRCERROR;
     } else {
-      number[i] = srcString[i] - BASE8_STARTNUM;
+      number[i] = (uint8_t)srcString[i] - BASE8_STARTNUM;
     }
   }
   return BASEX_OK;
