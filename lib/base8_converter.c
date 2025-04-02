@@ -122,24 +122,23 @@ baseX_returnType base8_decodeNum(
   }
 
   // Check allowed input length
-  if (0 != srcLength % NO_CHECK_BYTES && 0 != srcLength % BASE_BIT_LENGTH) {
+  uint8_t realBytes = srcLength % NO_CHECK_BYTES;
+  if (0 != realBytes && 0 != (realBytes % BASE_BIT_LENGTH)) {
     printf("Src error in length: %u\n", srcLength);
     return BASEX_SRCERROR;
   }
   // Set outputlength and check overflow
 
-  uint32_t outputLength = srcLength / BASE_BIT_LENGTH;
+  uint32_t outputLength = (srcLength / NO_CHECK_BYTES * BASE_BIT_LENGTH) + realBytes / BASE_BIT_LENGTH;
 
-  uint8_t checkBits = (srcLength % NO_CHECK_BYTES) / BASE_BIT_LENGTH;
-  // Set special case no checkBits results in one more character
-  if (!checkBits) {
-    outputLength++;
-  }
+  uint8_t checkBits = realBytes / BASE_BIT_LENGTH;
 
   if (outputLength > decodedBytesSize) {
+    printf("Error: Outputsize = %u\n", outputLength);
     return BASEX_OVERFLOW;
   }
 
+  printf("Outputlength = %u with input length %u => checkbits %u\n", outputLength, srcLength, checkBits);
   // Run algorithm
 
   uint32_t srcPos = 0;
@@ -154,19 +153,20 @@ baseX_returnType base8_decodeNum(
     for (uint8_t i = 0; i < (3 - carryLength / 2); i++, srcPos++) {
       carry = carry << 3;
       lastBitNumber = (srcNumbers[srcPos] & 0x07);
-      numberOfBits = baseNumberOfBits[lastBitNumber];
+      numberOfBits += baseNumberOfBits[lastBitNumber];
       carry |= lastBitNumber;
     }
     carryLength = (carryLength + 1) % 3;
     decodedBytes[outPos] = (carry >> carryLength);
     carry &= (0x3 >> (2 - carryLength));
+    printf("Carry: %u at input %1x with length %u\n", carry, decodedBytes[outPos], carryLength);
   }
   *decodedLength = outputLength;
 
   if (checkBits) {
-    lastBitNumber -= baseNumberOfBits[lastBitNumber];
-    if (carry != numberOfBits % (2 * carryLength)) {
-      printf("Src error in number of bits: %u\n", numberOfBits);
+    numberOfBits -= baseNumberOfBits[lastBitNumber];
+    if (carry != numberOfBits % (2 * checkBits)) {
+      printf("Src error in number of bits: %u to %u at input %x\n", numberOfBits, carry, srcNumbers[0]);
       return BASEX_SRCERROR;
     }
   }
