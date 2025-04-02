@@ -97,8 +97,16 @@ void test_fail_base8_decodeNum(void) {
   TEST_ASSERT_EQUAL_INT(BASEX_ARGUMENTS, base8_decodeNum(buf, &decodedLength, BUFFER_SIZE, NULL, BUFFER_SIZE));
   TEST_ASSERT_EQUAL_INT(BASEX_ARGUMENTS, base8_decodeNum(NULL, &decodedLength, 0, buf, 0));
   TEST_ASSERT_EQUAL_INT(BASEX_ARGUMENTS, base8_decodeNum(buf, NULL, 0, buf, 0));
-  TEST_ASSERT_EQUAL_INT(BASEX_OVERFLOW, base8_decodeNum(buf, &decodedLength, 1, buf, 16));
-  TEST_ASSERT_EQUAL_INT(BASEX_SRCERROR, base8_decodeNum(buf, &decodedLength, 2, buf, 9)); // Not enough || to much src bytes
+  TEST_ASSERT_EQUAL_INT(BASEX_OVERFLOW, base8_decodeNum(buf, &decodedLength, 1, buf, 16)); // Overflow
+  TEST_ASSERT_EQUAL_INT(BASEX_SRCERROR, base8_decodeNum(buf, &decodedLength, 2, buf, 9));  // To much bytes
+  TEST_ASSERT_EQUAL_INT(BASEX_SRCERROR, base8_decodeNum(buf, &decodedLength, 2, buf, 2));  // Not enough bytes
+  uint8_t wrongPattern[] = {0x03, 0x00, 0x01};
+  TEST_ASSERT_EQUAL_INT(BASEX_SRCERROR,
+      base8_decodeNum(buf, &decodedLength, 1, wrongPattern, sizeof(wrongPattern))); // Bit pattern wrong
+  wrongPattern[0] = 0x0;
+  wrongPattern[2] = 0x1;
+  TEST_ASSERT_EQUAL_INT(BASEX_SRCERROR,
+      base8_decodeNum(buf, &decodedLength, 1, wrongPattern, sizeof(wrongPattern))); // Bit pattern wrong
 }
 
 void test_base8_decodeNum(void) {
