@@ -1,4 +1,4 @@
-[![Test Status](https://github.com/steinerAdi/tinytime/actions/workflows/ci.yml/badge.svg)](https://github.com/steinerAdi/baseX-Converter/actions/workflows/ci.yml)
+[![Test Status](https://github.com/steinerAdi/baseX-Converter/actions/workflows/ci.yml/badge.svg)](https://github.com/steinerAdi/baseX-Converter/actions/workflows/ci.yml)
 
 # Base X converter
 
