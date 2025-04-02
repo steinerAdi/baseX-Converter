@@ -26,6 +26,7 @@
 
 #define BASE_BIT_LENGTH (3)
 #define BYTE_BIT_LENGTH (8)
+#define BASE8_STARTNUM ('1')
 
 const uint8_t baseNumberOfBits[8] = {
     0, // 000
@@ -37,9 +38,6 @@ const uint8_t baseNumberOfBits[8] = {
     2, // 110
     3, // 111
 };
-
-uint8_t
-carryToAscii(uint16_t carry);
 
 baseX_returnType base8_encodeBytes(
     uint8_t *encodedString,
@@ -85,25 +83,26 @@ baseX_returnType base8_encodeBytes(
   }
   // Add one additional number with checkBits
   if (checkBits) {
-    encodedString[outPos] = (carry >> (16 - BASE_BIT_LENGTH)) + (numberOfBits % (2 * checkBits)) + '1';
+    encodedString[outPos] = (carry >> (16 - BASE_BIT_LENGTH)) + (numberOfBits % (2 * checkBits)) + BASE8_STARTNUM;
     outPos++;
   }
   encodedString[outPos] = '\0';
   return BASEX_OK;
 }
 
-baseX_returnType base8_decodeString(
-    uint8_t *decodedBytes,
-    uint32_t decodedBytesSize,
+baseX_returnType base8_stringToNum(
+    uint8_t *number,
     const uint8_t *srcString) {
-
-  if (NULL == srcString) {
+#define MAX_CHARACTER ('8')
+  if (NULL == number || NULL == srcString) {
     return BASEX_ARGUMENTS;
   }
-
-  uint32_t srcLength = strlen((const char *)srcString);
-  for (uint32_t i = 0; i < srcLength; i++) {
-    ;
+  for (uint32_t i = 0; i < strlen(srcString); i++) {
+    if (srcString[i] < BASE8_STARTNUM || srcString[i] > MAX_CHARACTER) {
+      return BASEX_SRCERROR;
+    } else {
+      number[i] = srcString[i] - BASE8_STARTNUM;
+    }
   }
   return BASEX_OK;
 }
@@ -124,7 +123,6 @@ baseX_returnType base8_decodeNum(
   // Check allowed input length
   uint8_t realBytes = srcLength % NO_CHECK_BYTES;
   if (0 != realBytes && 0 != (realBytes % BASE_BIT_LENGTH)) {
-    printf("Src error in length: %u\n", srcLength);
     return BASEX_SRCERROR;
   }
   // Set outputlength and check overflow
@@ -134,16 +132,12 @@ baseX_returnType base8_decodeNum(
   uint8_t checkBits = realBytes / BASE_BIT_LENGTH;
 
   if (outputLength > decodedBytesSize) {
-    printf("Error: Outputsize = %u\n", outputLength);
     return BASEX_OVERFLOW;
   }
 
-  printf("Outputlength = %u with input length %u => checkbits %u\n", outputLength, srcLength, checkBits);
   // Run algorithm
-
   uint32_t srcPos = 0;
   uint32_t outPos = 0;
-
   uint16_t carry = 0;
   uint8_t carryLength = 0;
   uint32_t numberOfBits = 0;
@@ -159,21 +153,14 @@ baseX_returnType base8_decodeNum(
     carryLength = (carryLength + 1) % 3;
     decodedBytes[outPos] = (carry >> carryLength);
     carry &= (0x3 >> (2 - carryLength));
-    printf("Carry: %u at input %1x with length %u\n", carry, decodedBytes[outPos], carryLength);
   }
   *decodedLength = outputLength;
 
   if (checkBits) {
     numberOfBits -= baseNumberOfBits[lastBitNumber];
     if (carry != numberOfBits % (2 * checkBits)) {
-      printf("Src error in number of bits: %u to %u at input %x\n", numberOfBits, carry, srcNumbers[0]);
       return BASEX_SRCERROR;
     }
   }
   return BASEX_OK;
-}
-
-uint8_t carryToAscii(uint16_t carry) {
-  uint8_t number = (carry >> 13);
-  return number + '1';
 }

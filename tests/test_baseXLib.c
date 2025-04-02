@@ -114,7 +114,7 @@ int main(void) {
   UNITY_BEGIN();
   RUN_TEST(test_fail_base8_encode);
   RUN_TEST(test_base8_encode);
-  // RUN_TEST(test_fail_base8_decodeNum);
+  RUN_TEST(test_fail_base8_decodeNum);
   RUN_TEST(test_base8_decodeNum);
   return UNITY_END();
 }
