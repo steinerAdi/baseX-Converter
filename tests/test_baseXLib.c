@@ -110,11 +110,20 @@ test_base8_decodeNum(void) {
   }
 }
 
+void test_base8_stringToNum(void) {
+  uint8_t buf[BUFFER_SIZE];
+  for (uint32_t i = 0; i < sizeof(base8Data) / sizeof(base8Data[0]); i++) {
+    TEST_ASSERT_EQUAL_INT(BASEX_OK, base8_stringToNum(buf, base8Data[i].base8String));
+    TEST_ASSERT_EQUAL_UINT8_ARRAY(base8Data[i].base8Num, buf, strlen(base8Data[i].base8String));
+  }
+}
+
 int main(void) {
   UNITY_BEGIN();
   RUN_TEST(test_fail_base8_encode);
   RUN_TEST(test_base8_encode);
   RUN_TEST(test_fail_base8_decodeNum);
   RUN_TEST(test_base8_decodeNum);
+  RUN_TEST(test_base8_stringToNum);
   return UNITY_END();
 }
