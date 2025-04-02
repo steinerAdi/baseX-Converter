@@ -117,12 +117,13 @@ baseX_returnType base8_decodeNum(
 
 #define NO_CHECK_BYTES (8)
 
-  if (NULL == decodedBytes || NULL == srcNumbers) {
+  if (NULL == decodedBytes || NULL == decodedLength || NULL == srcNumbers) {
     return BASEX_ARGUMENTS;
   }
 
   // Check allowed input length
-  if (0 != srcLength % NO_CHECK_BYTES || 0 != srcLength % BASE_BIT_LENGTH) {
+  if (0 != srcLength % NO_CHECK_BYTES && 0 != srcLength % BASE_BIT_LENGTH) {
+    printf("Src error in length: %u\n", srcLength);
     return BASEX_SRCERROR;
   }
   // Set outputlength and check overflow
@@ -165,6 +166,7 @@ baseX_returnType base8_decodeNum(
   if (checkBits) {
     lastBitNumber -= baseNumberOfBits[lastBitNumber];
     if (carry != numberOfBits % (2 * carryLength)) {
+      printf("Src error in number of bits: %u\n", numberOfBits);
       return BASEX_SRCERROR;
     }
   }

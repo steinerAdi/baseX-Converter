@@ -84,6 +84,7 @@ void test_fail_base8_encode(void) {
   uint8_t buf[BUFFER_SIZE];
   TEST_ASSERT_EQUAL_INT(BASEX_ARGUMENTS, base8_encodeBytes(NULL, 0, buf, 0));
   TEST_ASSERT_EQUAL_INT(BASEX_ARGUMENTS, base8_encodeBytes(buf, 0, NULL, 0));
+  TEST_ASSERT_EQUAL_INT(BASEX_OVERFLOW, base8_encodeBytes(buf, 0, buf, 1));
 }
 
 void test_base8_encode(void) {
@@ -95,9 +96,18 @@ void test_base8_encode(void) {
   }
 }
 
+test_fail_base8_decodeNum(void) {
+  uint8_t buf[BUFFER_SIZE];
+  uint32_t decodedLength = 0;
+  TEST_ASSERT_EQUAL_INT(BASEX_ARGUMENTS, base8_decodeNum(NULL, &decodedLength, BUFFER_SIZE, buf, BUFFER_SIZE));
+  TEST_ASSERT_EQUAL_INT(BASEX_ARGUMENTS, base8_decodeNum(buf, NULL, 0, NULL, 0));
+  TEST_ASSERT_EQUAL_INT(BASEX_OVERFLOW, base8_decodeNum(buf, &decodedLength, 1, buf, 16));
+}
+
 int main(void) {
   UNITY_BEGIN();
   RUN_TEST(test_fail_base8_encode);
   RUN_TEST(test_base8_encode);
+  RUN_TEST(test_fail_base8_decodeNum);
   return UNITY_END();
 }
