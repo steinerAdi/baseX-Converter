@@ -1,4 +1,4 @@
-[![Test Status](https://github.com/steinerAdi/baseX-Converter/actions/workflows/ci.yml/badge.svg)](https://github.com/steinerAdi/baseX-Converter/actions/workflows/ci.yml)
+[![Test Status](https://github.com/steinerAdi/baseX-Converter/actions/workflows/ci.yml/badge.svg)](https://github.com/steinerAdi/baseX-Converter/actions/workflows/ci.yml)[![codecov](https://codecov.io/gh/steinerAdi/baseX-Converter/graph/badge.svg?token=NNY8ENLEP7)](https://codecov.io/gh/steinerAdi/baseX-Converter)
 
 # Base X converter
 
