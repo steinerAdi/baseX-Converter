@@ -64,7 +64,7 @@ baseX_returnType base8_encodeBytes(
  *
  * @param[out] number Buffer to store the resulting numeric representation.
  * @param[in] srcString Null-terminated base8-encoded input string.
- * @return baseX_returnType Status code indicating success or failure of the conversion.
+ * @return baseX_returnType Status code.
  */
 baseX_returnType base8_stringToNum(
     uint8_t *number,
@@ -81,7 +81,7 @@ baseX_returnType base8_stringToNum(
  * @param[in] decodedBytesSize Size of the output buffer in bytes.
  * @param[in] srcNumbers Input array containing base8-encoded numeric values.
  * @param[in] srcLength Length of the input numeric array.
- * @return baseX_returnType Status code indicating success or failure of the decoding.
+ * @return baseX_returnType Status code.
  */
 baseX_returnType base8_decodeNum(
     uint8_t *decodedBytes,
@@ -89,6 +89,25 @@ baseX_returnType base8_decodeNum(
     uint32_t decodedBytesSize,
     const uint8_t *srcNumbers,
     const uint32_t srcLength);
+
+/**
+ * @brief Decodes a base32-encoded string into a byte array.
+ *
+ * This function decodes a base32-encoded string back into its original
+ * byte representation based on RFC3548.
+ *
+ * @param[out] decodedBytes Buffer to store the decoded byte array.
+ * @param[out] decodedLength Pointer to store the actual number of decoded bytes.
+ * @param[in] decodedBytesSize Size of the output buffer in bytes.
+ * @param[in] srcString NULL-terminated base32-encoded input string.
+ * @param[in] srcLength the size of srcString
+ * @return baseX_returnType Status code.
+ */
+baseX_returnType base32_decodeString(
+    uint8_t *decodedBytes,
+    uint32_t *decodedLength,
+    uint32_t decodedBytesSize,
+    const char *srcString);
 
 #ifdef __cplusplus
 }

@@ -1,0 +1,87 @@
+/**
+ * @file base32_converter.c
+ * @author Adrian STEINER (adi.steiner@hotmail.ch)
+ * @brief
+ * @version 0.1
+ * @date 17-07-2025
+ *
+ * @copyright (C) 2025 Adrian STEINER
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
+ *
+ */
+
+#include "baseX_converter.h"
+
+#include <string.h>
+
+#define BASE_BIT_LENGTH (5)
+
+baseX_returnType base32_decodeString(
+    uint8_t *decodedBytes,
+    uint32_t *decodedLength,
+    uint32_t decodedBytesSize,
+    const char *srcString) {
+  // Definition constants
+  const char paddingCharacter = '=';
+  static const char *decodeTable = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+
+  if (!decodedBytes || !decodedLength || !srcString) {
+    return BASEX_ARGUMENTS;
+  }
+
+  uint32_t wPos = 0; // Write position
+  uint32_t rPos = 0; // Read position
+  uint32_t bits = 0; // Number of bits
+  uint32_t vbit = 0;
+
+  uint32_t srcLength = strlen(srcString);
+
+  if (0 == srcLength) {
+    return BASEX_SRCERROR;
+  }
+
+  while ((rPos < srcLength) || (vbit >= 8)) {
+    if (wPos >= decodedBytesSize) {
+      return BASEX_OVERFLOW;
+    }
+    if ((rPos < srcLength) && (vbit < 8)) {
+      const char *p;
+      char c = srcString[rPos++];
+
+      if (paddingCharacter == c) {
+        /* padding character */
+        if (rPos == srcLength) {
+          break; /* Ok, 1x '=' padding is allowed */
+        }
+        if ((paddingCharacter == srcString[rPos]) && (rPos + 1 == srcLength)) {
+          break; /* Ok, 2x '=' padding is allowed */
+        }
+        return BASEX_SRCERROR; /* invalid padding */
+      }
+      p = strchr(decodeTable, toupper(c));
+      if (!p) {
+        /* invalid character */
+        return BASEX_SRCERROR;
+      }
+      bits = (bits << BASE_BIT_LENGTH) | (p - decodeTable);
+      vbit += BASE_BIT_LENGTH;
+    }
+    if (vbit >= 8) {
+      decodedBytes[wPos++] = (bits >> (vbit - 8)) & 0xFF;
+      vbit -= 8;
+    }
+  }
+  *decodedLength = wPos;
+  return BASEX_OK;
+}
