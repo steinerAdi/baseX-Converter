@@ -170,6 +170,7 @@ void test_fail_base32_decodeString(void) {
   TEST_ASSERT_EQUAL_INT(BASEX_SRCERROR, base32_decodeString(decoded, &destLength, BUFFER_SIZE, "ABCDE===="));  // not allowed 4> paddings
   TEST_ASSERT_EQUAL_INT(BASEX_SRCERROR, base32_decodeString(decoded, &destLength, BUFFER_SIZE, "ABCDEFG=="));  // not allowed 2> paddings
   TEST_ASSERT_EQUAL_INT(BASEX_SRCERROR, base32_decodeString(decoded, &destLength, BUFFER_SIZE, "AB=C="));      // Padding only at the end
+  TEST_ASSERT_EQUAL_INT(BASEX_SRCERROR, base32_decodeString(decoded, &destLength, BUFFER_SIZE, ""));
   TEST_ASSERT_EQUAL_INT(BASEX_OVERFLOW, base32_decodeString(decoded, &destLength, 1, "ABC"));
 }
 
