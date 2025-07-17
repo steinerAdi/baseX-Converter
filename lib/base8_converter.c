@@ -1,7 +1,12 @@
 /**
- * @file base8_converter.h
- * @author Adrian STEINER (steia19@bfh.ch)
- * @brief Base 8 byte converter
+ * @file base8_converter.c
+ * @author Adrian STEINER (adi.steiner@hotmail.ch)
+ * @brief Base8 byte converter with parity validation for potential padding bits.
+ *
+ * This module provides functionality to encode and decode byte arrays using a base8 representation.
+ * It includes mechanisms to handle and verify parity bits that may be introduced due to padding,
+ * ensuring data integrity during conversion.
+ *
  * @version 0.1
  * @date 30-03-2025
  *
@@ -71,7 +76,7 @@ baseX_returnType base8_encodeBytes(
     for (uint8_t i = 0; i < (2 + (carryLength ? 1 : 0)); i++) {
       uint8_t newBase8Number = carry >> (16 - BASE_BIT_LENGTH);
       numberOfBits += baseNumberOfBits[newBase8Number];
-      encodedString[outPos] = newBase8Number + '1';
+      encodedString[outPos] = newBase8Number + BASE8_STARTNUM;
       outPos++;
       carry = (carry << BASE_BIT_LENGTH);
     }
@@ -93,7 +98,9 @@ baseX_returnType base8_encodeBytes(
 baseX_returnType base8_stringToNum(
     uint8_t *number,
     const char *srcString) {
+// Max character to reduce errors
 #define MAX_CHARACTER ('8')
+
   if (NULL == number || NULL == srcString) {
     return BASEX_ARGUMENTS;
   }
@@ -144,18 +151,17 @@ baseX_returnType base8_decodeNum(
   uint8_t lastBitNumber = 0;
 
   for (; outPos < outputLength; outPos++) {
-    for (uint8_t i = 0; i < (3 - carryLength / 2); i++, srcPos++) {
+    for (uint8_t i = 0; i < (BASE_BIT_LENGTH - carryLength / 2); i++, srcPos++) {
       carry = carry << 3;
       lastBitNumber = (srcNumbers[srcPos] & 0x07);
       numberOfBits += baseNumberOfBits[lastBitNumber];
       carry |= lastBitNumber;
     }
-    carryLength = (carryLength + 1) % 3;
+    carryLength = (carryLength + 1) % BASE_BIT_LENGTH;
     decodedBytes[outPos] = (carry >> carryLength);
     carry &= (0x3 >> (2 - carryLength));
   }
   *decodedLength = outputLength;
-
   if (checkBits) {
     numberOfBits -= baseNumberOfBits[lastBitNumber];
     if (carry != numberOfBits % (2 * checkBits)) {
