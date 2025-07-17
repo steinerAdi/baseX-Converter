@@ -164,9 +164,9 @@ void test_fail_base32_decodeString(void) {
   uint32_t destLength;
   TEST_ASSERT_EQUAL_INT(BASEX_ARGUMENTS, base32_decodeString(NULL, &destLength, BUFFER_SIZE, "2"));
   TEST_ASSERT_EQUAL_INT(BASEX_ARGUMENTS, base32_decodeString(decoded, NULL, BUFFER_SIZE, "2"));
-  TEST_ASSERT_EQUAL_INT(BASEX_SRCERROR, base32_decodeString(decoded, &destLength, BUFFER_SIZE, "1"));       // Character not allowed
-  TEST_ASSERT_EQUAL_INT(BASEX_SRCERROR, base32_decodeString(decoded, &destLength, BUFFER_SIZE, "ABC====")); // not allowed 4 Padding in this situation
-  TEST_ASSERT_EQUAL_INT(BASEX_SRCERROR, base32_decodeString(decoded, &destLength, BUFFER_SIZE, "AB=C="));   // Padding only at the end
+  TEST_ASSERT_EQUAL_INT(BASEX_SRCERROR, base32_decodeString(decoded, &destLength, BUFFER_SIZE, "1"));         // Character not allowed
+  TEST_ASSERT_EQUAL_INT(BASEX_SRCERROR, base32_decodeString(decoded, &destLength, BUFFER_SIZE, "ABC======")); // not allowed 7 paddings
+  TEST_ASSERT_EQUAL_INT(BASEX_SRCERROR, base32_decodeString(decoded, &destLength, BUFFER_SIZE, "AB=C="));     // Padding only at the end
   TEST_ASSERT_EQUAL_INT(BASEX_OVERFLOW, base32_decodeString(decoded, &destLength, 1, "ABC"));
 }
 
@@ -177,6 +177,24 @@ void test_base32_decodeString(void) {
     TEST_ASSERT_EQUAL_INT(BASEX_OK, base32_decodeString(decoded, &decodedLength, BUFFER_SIZE, base32_data[i].baseAsString));
     TEST_ASSERT_EQUAL_UINT8_ARRAY(base32_data[i].byteStream, decoded, base32_data[i].length);
     TEST_ASSERT_EQUAL_UINT32(base32_data[i].length, decodedLength);
+  }
+}
+
+void test_fail_base32_encodeBytes(void) {
+  char encoded[BUFFER_SIZE];
+  uint32_t destLength;
+  TEST_ASSERT_EQUAL_INT(BASEX_ARGUMENTS, base32_encodeBytes(NULL, BUFFER_SIZE, (const uint8_t *)"000", 3));
+  TEST_ASSERT_EQUAL_INT(BASEX_ARGUMENTS, base32_encodeBytes(encoded, BUFFER_SIZE, NULL, 3));
+  TEST_ASSERT_EQUAL_INT(BASEX_OVERFLOW, base32_encodeBytes(encoded, 2, (const uint8_t *)"000", 3)); // Overflow
+}
+
+void test_base32_encodeBytes(void) {
+  char encoded[BUFFER_SIZE];
+  uint32_t encodedLength = 0;
+  for (uint32_t i = 0; i < sizeof(base32_data) / sizeof(base32_data[0]); i++) {
+    TEST_ASSERT_EQUAL_INT(BASEX_OK, base32_encodeBytes(encoded, BUFFER_SIZE, base32_data[i].byteStream, base32_data[i].length));
+    TEST_ASSERT_EQUAL_CHAR_ARRAY(base32_data[i].baseAsString, encoded, strlen(base32_data[i].baseAsString));
+    TEST_ASSERT_EQUAL_UINT32(strlen(base32_data[i].baseAsString), strlen(encoded));
   }
 }
 
@@ -193,5 +211,7 @@ int main(void) {
   // Base 32 Tests
   RUN_TEST(test_fail_base32_decodeString);
   RUN_TEST(test_base32_decodeString);
+  RUN_TEST(test_fail_base32_encodeBytes);
+  RUN_TEST(test_base32_encodeBytes);
   return UNITY_END();
 }
