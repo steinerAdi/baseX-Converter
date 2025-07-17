@@ -109,6 +109,24 @@ baseX_returnType base32_decodeString(
     uint32_t decodedBytesSize,
     const char *srcString);
 
+/**
+ * @brief Encodes a byte array into a base32-encoded string (RFC 4648).
+ *
+ * This function converts the input byte array into a base32-encoded string using
+ * the standard RFC 4648 alphabet. The output string will be null-terminated.
+ *
+ * @param[out] encodedString Buffer to store the base32-encoded string.
+ * @param[in] encodedSize Size of the output buffer in bytes.
+ * @param[in] srcBytes Pointer to the input byte array.
+ * @param[in] srcLength Length of the input byte array in bytes.
+ * @return baseX_returnType Status code.
+ */
+baseX_returnType base32_encodeBytes(
+    char *encodedString,
+    uint32_t encodedSize,
+    const uint8_t *srcBytes,
+    uint32_t srcLength);
+
 #ifdef __cplusplus
 }
 #endif

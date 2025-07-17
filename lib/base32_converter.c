@@ -27,6 +27,9 @@
 #include <string.h>
 
 #define BASE_BIT_LENGTH (5)
+// Definition constants
+const char paddingCharacter = '=';
+static const char *base32_alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
 
 /**
  * @brief Calculates the number of base32 padding characters required for a given input length.
@@ -41,9 +44,6 @@ baseX_returnType base32_decodeString(
     uint32_t *decodedLength,
     uint32_t decodedBytesSize,
     const char *srcString) {
-  // Definition constants
-  const char paddingCharacter = '=';
-  static const char *decodeTable = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
 
   if (!decodedBytes || !decodedLength || !srcString) {
     return BASEX_ARGUMENTS;
@@ -84,12 +84,12 @@ baseX_returnType base32_decodeString(
         }
         break;
       }
-      p = strchr(decodeTable, toupper(c));
+      p = strchr(base32_alphabet, toupper(c));
       if (!p) {
         /* invalid character */
         return BASEX_SRCERROR;
       }
-      bits = (bits << BASE_BIT_LENGTH) | (p - decodeTable);
+      bits = (bits << BASE_BIT_LENGTH) | (p - base32_alphabet);
       vbit += BASE_BIT_LENGTH;
     }
     if (vbit >= 8) {
@@ -98,6 +98,49 @@ baseX_returnType base32_decodeString(
     }
   }
   *decodedLength = wPos;
+  return BASEX_OK;
+}
+
+baseX_returnType base32_encodeBytes(
+    char *encodedString,
+    uint32_t encodedSize,
+    const uint8_t *srcBytes,
+    uint32_t srcLength) {
+
+  if (!encodedString || !srcBytes)
+    return BASEX_ARGUMENTS;
+
+  uint32_t outputLength = ((srcLength + 4) / BASE_BIT_LENGTH) * 8;
+  if (encodedSize < (outputLength + 1)) { // +1 for null terminator
+    return BASEX_OVERFLOW;
+  }
+
+  uint32_t buffer = 0;
+  int bitsLeft = 0;
+  uint32_t outIndex = 0;
+
+  for (uint32_t i = 0; i < srcLength; ++i) {
+    buffer <<= 8;
+    buffer |= srcBytes[i] & 0xFF;
+    bitsLeft += 8;
+
+    while (bitsLeft >= BASE_BIT_LENGTH) {
+      encodedString[outIndex++] = base32_alphabet[(buffer >> (bitsLeft - BASE_BIT_LENGTH)) & 0x1F];
+      bitsLeft -= BASE_BIT_LENGTH;
+    }
+  }
+
+  if (bitsLeft > 0) {
+    buffer <<= (BASE_BIT_LENGTH - bitsLeft);
+    encodedString[outIndex++] = base32_alphabet[buffer & 0x1F];
+  }
+
+  // Padding
+  while (outIndex % 8 != 0) {
+    encodedString[outIndex++] = paddingCharacter;
+  }
+
+  encodedString[outIndex] = '\0';
   return BASEX_OK;
 }
 
@@ -114,6 +157,6 @@ uint8_t base32_padding(uint32_t inputLength) {
   case 4:
     return 1;
   default:
-    return 0; // Should never happen
+    return 0;
   }
 }
