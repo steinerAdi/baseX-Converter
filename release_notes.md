@@ -1,9 +1,9 @@
-**Release Date:** 03.04.2025
-**Tag:** v0.0.1
-**Highlights:** First release of tested base8 lib
+**Release Date:** 18.07.2025
+**Tag:** v0.0.2
+**Highlights:** Release of base32 converting
 
 ## Library
-- The library is written in C for base-8 representation with an included parity check
+- Add to the library the base32 converting (encode and decode of base32 strings)
 
 ## Tests
-- With C Unity tests, the code is tested to defined times and possible user errors
+- All tests for the base32 library are successful

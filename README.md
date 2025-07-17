@@ -32,21 +32,29 @@ It can also be entered with the basic keyboard.
 ### Installation
 Include the lib directory library into your project. 
 
-
 ### Base-8 Conversion
-
+Implemented and tested.
+Do not forget to compile the file [lib/base8_converter.c](lib/base8_converter.c) for using these functions.
 
 ### Base-16 Conversion
+!TODO
+
+### Base-32 Conversion
+Implemented and tested.
+See the doxygen comments for ``base32_decodeString`` and ``base32_encodeBytes`` functions.
+Do not forget to compile the file [lib/base32_converter.c](lib/base32_converter.c) for using these functions.
+
+### Base-64 Conversion
+!TODO
 
 ## Usage
-
+Converter to read in byte data with different methods.
 
 ## License
 Distributed under the GNU general public license.
 See [LICENSE](LICENSE) for more information.
 
 ## Authors
-
 - Adrian STEINER (adi.steiner@hotmail.ch)
 
 ## Acknowledgments
