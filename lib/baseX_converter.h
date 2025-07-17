@@ -30,12 +30,16 @@ extern "C" {
 
 #include <stdint.h>
 
+/**
+ * @brief Function return state
+ *
+ */
 typedef enum {
-  BASEX_OK = 0,
-  BASEX_ARGUMENTS,
-  BASEX_OVERFLOW,
-  BASEX_SRCERROR,
-  BASEX_ERROR
+  BASEX_OK = 0,    ///< Success
+  BASEX_ARGUMENTS, ///< Invalid function arguments
+  BASEX_OVERFLOW,  ///< Buffer overflow
+  BASEX_SRCERROR,  ///< Invalid baseX input data
+  BASEX_ERROR      ///< Unexpected error
 } baseX_returnType;
 
 /**
