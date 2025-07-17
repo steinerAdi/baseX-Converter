@@ -1,7 +1,7 @@
 /**
  * @file base32_converter.c
  * @author Adrian STEINER (adi.steiner@hotmail.ch)
- * @brief
+ * @brief Base32 byte converter.
  * @version 0.1
  * @date 17-07-2025
  *
@@ -23,9 +23,18 @@
 
 #include "baseX_converter.h"
 
+#include <ctype.h>
 #include <string.h>
 
 #define BASE_BIT_LENGTH (5)
+
+/**
+ * @brief Calculates the number of base32 padding characters required for a given input length.
+ *
+ * @param inputLength Length of the input byte array.
+ * @return Number of '=' padding characters (0, 1, 3, 4, or 6).
+ */
+uint8_t base32_padding(uint32_t inputLength);
 
 baseX_returnType base32_decodeString(
     uint8_t *decodedBytes,
@@ -61,13 +70,19 @@ baseX_returnType base32_decodeString(
 
       if (paddingCharacter == c) {
         /* padding character */
-        if (rPos == srcLength) {
-          break; /* Ok, 1x '=' padding is allowed */
+        uint8_t expectedPadding = base32_padding(wPos);
+
+        for (size_t i = 1; i < expectedPadding && rPos < srcLength; i++, rPos++) {
+          // Check only accepted padding bytes
+          if (paddingCharacter != srcString[rPos]) {
+            return BASEX_SRCERROR;
+          }
         }
-        if ((paddingCharacter == srcString[rPos]) && (rPos + 1 == srcLength)) {
-          break; /* Ok, 2x '=' padding is allowed */
+        if (rPos < srcLength) {
+          // To much padding bytes
+          return BASEX_SRCERROR;
         }
-        return BASEX_SRCERROR; /* invalid padding */
+        break;
       }
       p = strchr(decodeTable, toupper(c));
       if (!p) {
@@ -84,4 +99,21 @@ baseX_returnType base32_decodeString(
   }
   *decodedLength = wPos;
   return BASEX_OK;
+}
+
+uint8_t base32_padding(uint32_t inputLength) {
+  switch (inputLength % 5) {
+  case 0:
+    return 0;
+  case 1:
+    return 6;
+  case 2:
+    return 4;
+  case 3:
+    return 3;
+  case 4:
+    return 1;
+  default:
+    return 0; // Should never happen
+  }
 }

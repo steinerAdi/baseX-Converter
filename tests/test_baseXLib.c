@@ -33,47 +33,68 @@ void tearDown(void) {
 #define BYTESTREAM_SIZE (32)
 #define BUFFER_SIZE (3 * BYTESTREAM_SIZE)
 
-struct {
+typedef struct {
   uint8_t byteStream[BYTESTREAM_SIZE];
   uint32_t length;
-  char base8String[BUFFER_SIZE];
-  uint8_t base8Num[BUFFER_SIZE];
-} base8Data[] = {
+  char baseAsString[BUFFER_SIZE];
+  uint8_t baseNumerical[BUFFER_SIZE];
+} baseX_testData;
+
+baseX_testData base8_data[] = {
     {.byteStream = {0x00},
         .length = 1,
-        .base8String = "111",
-        .base8Num = {0, 0, 0}},
+        .baseAsString = "111",
+        .baseNumerical = {0, 0, 0}},
     {.byteStream = {0x3F},
         .length = 1,
-        .base8String = "287",
-        .base8Num = {1, 7, 6}},
+        .baseAsString = "287",
+        .baseNumerical = {1, 7, 6}},
     {.byteStream = {0xA5, 0xB3},
         .length = 2,
-        .base8String = "624425",
-        .base8Num = {5, 1, 3, 3, 1, 4}},
+        .baseAsString = "624425",
+        .baseNumerical = {5, 1, 3, 3, 1, 4}},
     {.byteStream = {0xC9, 0x4F, 0x1A},
         .length = 3,
-        .base8String = "73358543",
-        .base8Num = {6, 2, 2, 4, 7, 4, 3, 2}},
+        .baseAsString = "73358543",
+        .baseNumerical = {6, 2, 2, 4, 7, 4, 3, 2}},
     {.byteStream = {0x65},
         .length = 1,
-        .base8String = "424",
-        .base8Num = {3, 1, 3}},
+        .baseAsString = "424",
+        .baseNumerical = {3, 1, 3}},
     {.byteStream = {0x42, 0x81, 0x7F, 0x11, 0x0A, 0xB8, 0x65},
         .length = 7,
-        .base8String = "3161168815316381423",
-        .base8Num = {
+        .baseAsString = "3161168815316381423",
+        .baseNumerical = {
             2, 0, 5, 0, 0, 5, 7, 7,
             0, 4, 2, 0, 5, 2, 7, 0,
             3, 1, 2}},
-    {.byteStream = {0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF, 0x11, 0x22, 0x33}, .length = 9, .base8String = "636468257847848815332174", .base8Num = {5, 2, 5, 3, 5, 7, 1, 4, 6, 7, 3, 6, 7, 3, 7, 7, 0, 4, 2, 2, 1, 0, 6, 3}},
-    // {.byteStream = {0xF3, 0xE7, 0xD1, 0xA4, 0x5B, 0x92, 0x3C, 0xEF, 0x01, 0x7A, 0xA9, 0x4D, 0x82, 0xC7, 0x5F, 0x3B, 0xD4, 0x9E, 0x8A, 0x6F, 0xB1, 0xC0, 0xFA, 0x27, 0x13, 0x99, 0xE8, 0x4C, 0x21, 0x7D, 0x5A},
-    //     .length = 5,
-    //     .base8String = "287",
-    //     .base8Num = {7, 4, 7, 6, 3, 5, 1, 5, 1, 2, 2, 6, 7, 1, 2, 3, 6, 0, 3, 5, 7, 5, 0, 1, 7, 2, 5, 1, 2, 3, 2, 3,
-    //         0, 2, 6, 1, 7, 5, 3, 7, 7, 5, 2, 3, 6, 2, 1, 2, 6, 7, 3, 6, 2, 6, 0, 1, 7, 5, 4, 3, 4, 4, 7, 7,
-    //         5, 6, 5, 4, 3, 4, 0}},
-};
+    {.byteStream = {0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF, 0x11, 0x22, 0x33}, .length = 9, .baseAsString = "636468257847848815332174", .baseNumerical = {5, 2, 5, 3, 5, 7, 1, 4, 6, 7, 3, 6, 7, 3, 7, 7, 0, 4, 2, 2, 1, 0, 6, 3}}};
+
+baseX_testData base32_data[] = {
+    {
+        // Single byte
+        .byteStream = {0x66}, // ASCII 'f'
+        .length = 1,
+        .baseAsString = "MY======", // base32 of 'f'
+        .baseNumerical = {12, 24}   // M=12, Y=24 (example values)
+    },
+    {
+        // "foo"
+        .byteStream = {0x66, 0x6f, 0x6f}, // "foo"
+        .length = 3,
+        .baseAsString = "MZXW6===",
+        .baseNumerical = {12, 25, 23, 22} // M=12, Z=25, X=23, W=22 (example)
+    },
+    {// "foobar"
+        .byteStream = {0x66, 0x6f, 0x6f, 0x62, 0x61, 0x72},
+        .length = 6,
+        .baseAsString = "MZXW6YTBOI======",
+        .baseNumerical = {12, 25, 23, 22, 24, 19, 1, 14}},
+    {// All zero bytes
+        .byteStream = {0x00, 0x00, 0x00, 0x00, 0x00},
+        .length = 5,
+        .baseAsString = "AAAAAAAA",
+        .baseNumerical = {0, 0, 0, 0, 0, 0, 0, 0}}};
 
 void test_fail_base8_encode(void) {
   uint8_t buf[BUFFER_SIZE];
@@ -85,9 +106,9 @@ void test_fail_base8_encode(void) {
 void test_base8_encode(void) {
   uint8_t buf[BUFFER_SIZE];
 
-  for (uint32_t i = 0; i < sizeof(base8Data) / sizeof(base8Data[0]); i++) {
-    TEST_ASSERT_EQUAL_INT(BASEX_OK, base8_encodeBytes(buf, BUFFER_SIZE, base8Data[i].byteStream, base8Data[i].length));
-    TEST_ASSERT_EQUAL_UINT8_ARRAY(base8Data[i].base8String, buf, strlen((const char *)buf));
+  for (uint32_t i = 0; i < sizeof(base8_data) / sizeof(base8_data[0]); i++) {
+    TEST_ASSERT_EQUAL_INT(BASEX_OK, base8_encodeBytes(buf, BUFFER_SIZE, base8_data[i].byteStream, base8_data[i].length));
+    TEST_ASSERT_EQUAL_UINT8_ARRAY(base8_data[i].baseAsString, buf, strlen((const char *)buf));
   }
 }
 
@@ -113,9 +134,13 @@ void test_base8_decodeNum(void) {
   uint8_t buf[BUFFER_SIZE];
   uint32_t decodedLength = 0;
 
-  for (uint32_t i = 0; i < sizeof(base8Data) / sizeof(base8Data[0]); i++) {
-    TEST_ASSERT_EQUAL_INT((int)BASEX_OK, (int)base8_decodeNum(buf, &decodedLength, BUFFER_SIZE, base8Data[i].base8Num, strlen((const char *)base8Data[i].base8String)));
-    TEST_ASSERT_EQUAL_UINT8_ARRAY(base8Data[i].byteStream, buf, decodedLength);
+  for (uint32_t i = 0; i < sizeof(base8_data) / sizeof(base8_data[0]); i++) {
+    TEST_ASSERT_EQUAL_INT((int)BASEX_OK,
+        (int)base8_decodeNum(buf,
+            &decodedLength,
+            BUFFER_SIZE, base8_data[i].baseNumerical,
+            strlen((const char *)base8_data[i].baseAsString)));
+    TEST_ASSERT_EQUAL_UINT8_ARRAY(base8_data[i].byteStream, buf, decodedLength);
   }
 }
 
@@ -128,19 +153,45 @@ void test_fail_base8_stringToNum(void) {
 
 void test_base8_stringToNum(void) {
   uint8_t buf[BUFFER_SIZE];
-  for (uint32_t i = 0; i < sizeof(base8Data) / sizeof(base8Data[0]); i++) {
-    TEST_ASSERT_EQUAL_INT(BASEX_OK, base8_stringToNum(buf, base8Data[i].base8String));
-    TEST_ASSERT_EQUAL_UINT8_ARRAY(base8Data[i].base8Num, buf, strlen(base8Data[i].base8String));
+  for (uint32_t i = 0; i < sizeof(base8_data) / sizeof(base8_data[0]); i++) {
+    TEST_ASSERT_EQUAL_INT(BASEX_OK, base8_stringToNum(buf, base8_data[i].baseAsString));
+    TEST_ASSERT_EQUAL_UINT8_ARRAY(base8_data[i].baseNumerical, buf, strlen(base8_data[i].baseAsString));
+  }
+}
+
+void test_fail_base32_decodeString(void) {
+  uint8_t decoded[BUFFER_SIZE];
+  uint32_t destLength;
+  TEST_ASSERT_EQUAL_INT(BASEX_ARGUMENTS, base32_decodeString(NULL, &destLength, BUFFER_SIZE, "2"));
+  TEST_ASSERT_EQUAL_INT(BASEX_ARGUMENTS, base32_decodeString(decoded, NULL, BUFFER_SIZE, "2"));
+  TEST_ASSERT_EQUAL_INT(BASEX_SRCERROR, base32_decodeString(decoded, &destLength, BUFFER_SIZE, "1"));       // Character not allowed
+  TEST_ASSERT_EQUAL_INT(BASEX_SRCERROR, base32_decodeString(decoded, &destLength, BUFFER_SIZE, "ABC====")); // not allowed 4 Padding in this situation
+  TEST_ASSERT_EQUAL_INT(BASEX_SRCERROR, base32_decodeString(decoded, &destLength, BUFFER_SIZE, "AB=C="));   // Padding only at the end
+  TEST_ASSERT_EQUAL_INT(BASEX_OVERFLOW, base32_decodeString(decoded, &destLength, 1, "ABC"));
+}
+
+void test_base32_decodeString(void) {
+  uint8_t decoded[BUFFER_SIZE];
+  uint32_t decodedLength = 0;
+  for (uint32_t i = 0; i < sizeof(base32_data) / sizeof(base32_data[0]); i++) {
+    TEST_ASSERT_EQUAL_INT(BASEX_OK, base32_decodeString(decoded, &decodedLength, BUFFER_SIZE, base32_data[i].baseAsString));
+    TEST_ASSERT_EQUAL_UINT8_ARRAY(base32_data[i].byteStream, decoded, base32_data[i].length);
+    TEST_ASSERT_EQUAL_UINT32(base32_data[i].length, decodedLength);
   }
 }
 
 int main(void) {
   UNITY_BEGIN();
+  // Base 8 Tests
   RUN_TEST(test_fail_base8_encode);
   RUN_TEST(test_base8_encode);
   RUN_TEST(test_fail_base8_decodeNum);
   RUN_TEST(test_base8_decodeNum);
   RUN_TEST(test_fail_base8_stringToNum);
   RUN_TEST(test_base8_stringToNum);
+
+  // Base 32 Tests
+  RUN_TEST(test_fail_base32_decodeString);
+  RUN_TEST(test_base32_decodeString);
   return UNITY_END();
 }

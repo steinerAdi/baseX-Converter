@@ -4,7 +4,7 @@ LDFLAGS= \
 -I../unity\
 -I../lib 
 
-SRC=../lib/base8_converter.c ../unity/unity.c
+SRC=$(wildcard ../lib/*.c) ../unity/unity.c
 TEST=test_baseXLib.c
 OUT=test_baseXLib
 
