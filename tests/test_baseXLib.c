@@ -149,6 +149,7 @@ void test_fail_base8_stringToNum(void) {
   TEST_ASSERT_EQUAL_INT(BASEX_ARGUMENTS, base8_stringToNum(NULL, "0"));
   TEST_ASSERT_EQUAL_INT(BASEX_ARGUMENTS, base8_stringToNum(buf, NULL));
   TEST_ASSERT_EQUAL_INT(BASEX_SRCERROR, base8_stringToNum(buf, "0"));
+  TEST_ASSERT_EQUAL_INT(BASEX_ARGUMENTS, base8_stringToNum(buf, ""));
 }
 
 void test_base8_stringToNum(void) {

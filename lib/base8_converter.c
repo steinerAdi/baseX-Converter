@@ -104,7 +104,12 @@ baseX_returnType base8_stringToNum(
   if (NULL == number || NULL == srcString) {
     return BASEX_ARGUMENTS;
   }
-  for (uint32_t i = 0; i < strlen(srcString); i++) {
+  uint32_t srcLength = strlen(srcString);
+  if (0 == srcLength) {
+    return BASEX_ARGUMENTS;
+  }
+
+  for (uint32_t i = 0; i < srcLength; i++) {
     if (srcString[i] < BASE8_STARTNUM || srcString[i] > MAX_CHARACTER) {
       return BASEX_SRCERROR;
     } else {
