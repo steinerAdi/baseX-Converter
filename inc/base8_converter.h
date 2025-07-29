@@ -1,9 +1,9 @@
 /**
- * @file baseX_converter.h
- * @author Adrian STEINER (steia19@bfh.ch)
- * @brief Converter to convert bytes to base 8, 16 and 32 conversion.
+ * @file base8_converter.h
+ * @author Adrian STEINER (adi.steiner@hotmail.ch)
+ * @brief Converter to convert bytes to base 8 and vis-versa.
  * @version 0.1
- * @date 30-03-2025
+ * @date 29-07-2025
  *
  * @copyright (C) 2025 Adrian STEINER
  * This program is free software: you can redistribute it and/or modify
@@ -21,26 +21,19 @@
  *
  */
 
-#ifndef BASEX_CONVERTER_H
-#define BASEX_CONVERTER_H
+#ifndef BASE8_CONVERTER_H
+#define BASE8_CONVERTER_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+#include "baseX_types.h"
 #include <stdint.h>
 
-/**
- * @brief Function return state
- *
- */
-typedef enum {
-  BASEX_OK = 0,    ///< Success
-  BASEX_ARGUMENTS, ///< Invalid function arguments
-  BASEX_OVERFLOW,  ///< Buffer overflow
-  BASEX_SRCERROR,  ///< Invalid baseX input data
-  BASEX_ERROR      ///< Unexpected error
-} baseX_returnType;
+#define BASE8_BIT_LENGTH (3)  ///< Bit length of base8 input
+#define BASE8_STARTCHAR ('1') ///< Start character of a base8 input
+#define BASE8_ENDCHAR ('8')   ///< End character of a base8 input
 
 /**
  * @brief Encodes a byte array into a base8-encoded string.
@@ -94,45 +87,8 @@ baseX_returnType base8_decodeNum(
     const uint8_t *srcNumbers,
     const uint32_t srcLength);
 
-/**
- * @brief Decodes a base32-encoded string into a byte array.
- *
- * This function decodes a base32-encoded string back into its original
- * byte representation based on RFC3548.
- *
- * @param[out] decodedBytes Buffer to store the decoded byte array.
- * @param[out] decodedLength Pointer to store the actual number of decoded bytes.
- * @param[in] decodedBytesSize Size of the output buffer in bytes.
- * @param[in] srcString NULL-terminated base32-encoded input string.
- * @param[in] srcLength the size of srcString
- * @return baseX_returnType Status code.
- */
-baseX_returnType base32_decodeString(
-    uint8_t *decodedBytes,
-    uint32_t *decodedLength,
-    uint32_t decodedBytesSize,
-    const char *srcString);
-
-/**
- * @brief Encodes a byte array into a base32-encoded string (RFC 4648).
- *
- * This function converts the input byte array into a base32-encoded string using
- * the standard RFC 4648 alphabet. The output string will be null-terminated.
- *
- * @param[out] encodedString Buffer to store the base32-encoded string.
- * @param[in] encodedSize Size of the output buffer in bytes.
- * @param[in] srcBytes Pointer to the input byte array.
- * @param[in] srcLength Length of the input byte array in bytes.
- * @return baseX_returnType Status code.
- */
-baseX_returnType base32_encodeBytes(
-    char *encodedString,
-    uint32_t encodedSize,
-    const uint8_t *srcBytes,
-    uint32_t srcLength);
-
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* BASEX_CONVERTER_H */
+#endif /* BASE8_CONVERTER_H */

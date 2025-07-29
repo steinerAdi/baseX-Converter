@@ -2,9 +2,9 @@ CC=gcc
 CFLAGS=-Wall -Wextra -Wpedantic --coverage
 LDFLAGS= \
 -I../unity\
--I../lib 
+-I../inc
 
-SRC=$(wildcard ../lib/*.c) ../unity/unity.c
+SRC=$(wildcard ../src/*.c) ../unity/unity.c
 TEST=test_baseXLib.c
 OUT=test_baseXLib
 

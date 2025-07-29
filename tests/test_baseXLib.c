@@ -21,7 +21,8 @@
  *
  */
 
-#include "baseX_converter.h"
+#include "base32_converter.h"
+#include "base8_converter.h"
 #include "unity.h"
 #include <string.h>
 
