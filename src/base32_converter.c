@@ -21,15 +21,13 @@
  *
  */
 
-#include "baseX_converter.h"
+#include "base32_converter.h"
 
 #include <ctype.h>
 #include <string.h>
 
-#define BASE_BIT_LENGTH (5)
-// Definition constants
-const char paddingCharacter = '=';
-static const char *base32_alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+const char paddingCharacter = '=';                                       ///< Padding character
+static const char *base32_alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"; ///< used base32 characters listed as an alphabet
 
 /**
  * @brief Calculates the number of base32 padding characters required for a given input length.
@@ -89,8 +87,8 @@ baseX_returnType base32_decodeString(
         /* invalid character */
         return BASEX_SRCERROR;
       }
-      bits = (bits << BASE_BIT_LENGTH) | (p - base32_alphabet);
-      vbit += BASE_BIT_LENGTH;
+      bits = (bits << BASE32_BIT_LENGTH) | (p - base32_alphabet);
+      vbit += BASE32_BIT_LENGTH;
     }
     if (vbit >= 8) {
       decodedBytes[wPos++] = (bits >> (vbit - 8)) & 0xFF;
@@ -110,7 +108,7 @@ baseX_returnType base32_encodeBytes(
   if (!encodedString || !srcBytes)
     return BASEX_ARGUMENTS;
 
-  uint32_t outputLength = ((srcLength + 4) / BASE_BIT_LENGTH) * 8;
+  uint32_t outputLength = ((srcLength + 4) / BASE32_BIT_LENGTH) * 8;
   if (encodedSize < (outputLength + 1)) { // +1 for null terminator
     return BASEX_OVERFLOW;
   }
@@ -124,14 +122,14 @@ baseX_returnType base32_encodeBytes(
     buffer |= srcBytes[i] & 0xFF;
     bitsLeft += 8;
 
-    while (bitsLeft >= BASE_BIT_LENGTH) {
-      encodedString[outIndex++] = base32_alphabet[(buffer >> (bitsLeft - BASE_BIT_LENGTH)) & 0x1F];
-      bitsLeft -= BASE_BIT_LENGTH;
+    while (bitsLeft >= BASE32_BIT_LENGTH) {
+      encodedString[outIndex++] = base32_alphabet[(buffer >> (bitsLeft - BASE32_BIT_LENGTH)) & 0x1F];
+      bitsLeft -= BASE32_BIT_LENGTH;
     }
   }
 
   if (bitsLeft > 0) {
-    buffer <<= (BASE_BIT_LENGTH - bitsLeft);
+    buffer <<= (BASE32_BIT_LENGTH - bitsLeft);
     encodedString[outIndex++] = base32_alphabet[buffer & 0x1F];
   }
 

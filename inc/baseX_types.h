@@ -1,9 +1,9 @@
 /**
- * @file base16_converter.c
+ * @file baseX_types.h
  * @author Adrian STEINER (steia19@bfh.ch)
- * @brief Base16 byte converter.
+ * @brief BaseX defined types
  * @version 0.1
- * @date 17-07-2025
+ * @date 30-03-2025
  *
  * @copyright (C) 2025 Adrian STEINER
  * This program is free software: you can redistribute it and/or modify
@@ -21,4 +21,31 @@
  *
  */
 
-#include "baseX_converter.h"
+#ifndef BASEX_CONVERTER_H
+#define BASEX_CONVERTER_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include <stdint.h>
+
+/**
+ * @brief Function return state
+ *
+ */
+typedef enum {
+  BASEX_OK = 0,    ///< Success
+  BASEX_ARGUMENTS, ///< Invalid function arguments
+  BASEX_OVERFLOW,  ///< Buffer overflow
+  BASEX_SRCERROR,  ///< Invalid baseX input data
+  BASEX_ERROR      ///< Unexpected error
+} baseX_returnType;
+
+#define BASEX_BYTE_BIT_LENGTH (8)
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* BASEX_CONVERTER_H */
