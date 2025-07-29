@@ -1,9 +1,11 @@
-**Release Date:** 26.07.2025
-**Tag:** v0.0.3
-**Highlights:** Updated base8_stringToNum function with checking src length
+**Release Date:** 29.07.2025
+**Tag:** v0.1.0
+**Highlights:** Update file organization, add header file for each converter
 
 ## Library
-- Update the base8_stringToNum function with src length check and using the same buffer for src and destination
+- Reorganize the files into new directories
+- Add for each converter an own header file
+- Add a types base file for global defines for all converters
 
 ## Tests
-- Add new empty string as input for base8_stringToNum
+- Update the tests to the new file organization
