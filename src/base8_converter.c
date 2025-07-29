@@ -26,12 +26,8 @@
  *
  */
 
-#include "baseX_converter.h"
+#include "base8_converter.h"
 #include <string.h>
-
-#define BASE_BIT_LENGTH (3)
-#define BYTE_BIT_LENGTH (8)
-#define BASE8_STARTNUM ('1')
 
 const uint8_t baseNumberOfBits[8] = {
     0, // 000
@@ -54,9 +50,9 @@ baseX_returnType base8_encodeBytes(
   }
 
   // Check needed length
-  uint32_t outputLength = srcBytesSize * BYTE_BIT_LENGTH / BASE_BIT_LENGTH;
+  uint32_t outputLength = srcBytesSize * BASEX_BYTE_BIT_LENGTH / BASE8_BIT_LENGTH;
 
-  uint8_t checkBits = (srcBytesSize) % BASE_BIT_LENGTH;
+  uint8_t checkBits = (srcBytesSize) % BASE8_BIT_LENGTH;
   if (checkBits) {
     outputLength++;
   }
@@ -72,13 +68,13 @@ baseX_returnType base8_encodeBytes(
   uint32_t outPos = 0;
 
   for (uint32_t srcPos = 0; srcPos < srcBytesSize; srcPos++) {
-    carry += ((((uint16_t)srcBytes[srcPos]) & UINT8_MAX) << (BYTE_BIT_LENGTH - carryLength));
+    carry += ((((uint16_t)srcBytes[srcPos]) & UINT8_MAX) << (BASEX_BYTE_BIT_LENGTH - carryLength));
     for (uint8_t i = 0; i < (2 + (carryLength ? 1 : 0)); i++) {
-      uint8_t newBase8Number = carry >> (16 - BASE_BIT_LENGTH);
+      uint8_t newBase8Number = carry >> (16 - BASE8_BIT_LENGTH);
       numberOfBits += baseNumberOfBits[newBase8Number];
-      encodedString[outPos] = newBase8Number + BASE8_STARTNUM;
+      encodedString[outPos] = newBase8Number + BASE8_STARTCHAR;
       outPos++;
-      carry = (carry << BASE_BIT_LENGTH);
+      carry = (carry << BASE8_BIT_LENGTH);
     }
     if (0 == carryLength) {
       carryLength = 2;
@@ -88,7 +84,7 @@ baseX_returnType base8_encodeBytes(
   }
   // Add one additional number with checkBits
   if (checkBits) {
-    encodedString[outPos] = (carry >> (16 - BASE_BIT_LENGTH)) + (numberOfBits % (2 * checkBits)) + BASE8_STARTNUM;
+    encodedString[outPos] = (carry >> (16 - BASE8_BIT_LENGTH)) + (numberOfBits % (2 * checkBits)) + BASE8_STARTCHAR;
     outPos++;
   }
   encodedString[outPos] = '\0';
@@ -98,9 +94,6 @@ baseX_returnType base8_encodeBytes(
 baseX_returnType base8_stringToNum(
     uint8_t *number,
     const char *srcString) {
-// Max character to reduce errors
-#define MAX_CHARACTER ('8')
-
   if (NULL == number || NULL == srcString) {
     return BASEX_ARGUMENTS;
   }
@@ -110,10 +103,10 @@ baseX_returnType base8_stringToNum(
   }
 
   for (uint32_t i = 0; i < srcLength; i++) {
-    if (srcString[i] < BASE8_STARTNUM || srcString[i] > MAX_CHARACTER) {
+    if (srcString[i] < BASE8_STARTCHAR || srcString[i] > BASE8_ENDCHAR) {
       return BASEX_SRCERROR;
     } else {
-      number[i] = (uint8_t)srcString[i] - BASE8_STARTNUM;
+      number[i] = (uint8_t)srcString[i] - BASE8_STARTCHAR;
     }
   }
   return BASEX_OK;
@@ -134,14 +127,14 @@ baseX_returnType base8_decodeNum(
 
   // Check allowed input length
   uint8_t realBytes = srcLength % NO_CHECK_BYTES;
-  if (0 != realBytes && 0 != (realBytes % BASE_BIT_LENGTH)) {
+  if (0 != realBytes && 0 != (realBytes % BASE8_BIT_LENGTH)) {
     return BASEX_SRCERROR;
   }
   // Set outputlength and check overflow
 
-  uint32_t outputLength = (srcLength / NO_CHECK_BYTES * BASE_BIT_LENGTH) + realBytes / BASE_BIT_LENGTH;
+  uint32_t outputLength = (srcLength / NO_CHECK_BYTES * BASE8_BIT_LENGTH) + realBytes / BASE8_BIT_LENGTH;
 
-  uint8_t checkBits = realBytes / BASE_BIT_LENGTH;
+  uint8_t checkBits = realBytes / BASE8_BIT_LENGTH;
 
   if (outputLength > decodedBytesSize) {
     return BASEX_OVERFLOW;
@@ -156,13 +149,13 @@ baseX_returnType base8_decodeNum(
   uint8_t lastBitNumber = 0;
 
   for (; outPos < outputLength; outPos++) {
-    for (uint8_t i = 0; i < (BASE_BIT_LENGTH - carryLength / 2); i++, srcPos++) {
+    for (uint8_t i = 0; i < (BASE8_BIT_LENGTH - carryLength / 2); i++, srcPos++) {
       carry = carry << 3;
       lastBitNumber = (srcNumbers[srcPos] & 0x07);
       numberOfBits += baseNumberOfBits[lastBitNumber];
       carry |= lastBitNumber;
     }
-    carryLength = (carryLength + 1) % BASE_BIT_LENGTH;
+    carryLength = (carryLength + 1) % BASE8_BIT_LENGTH;
     decodedBytes[outPos] = (carry >> carryLength);
     carry &= (0x3 >> (2 - carryLength));
   }
