@@ -1,6 +1,6 @@
 /**
  * @file baseX_types.h
- * @author Adrian STEINER (steia19@bfh.ch)
+ * @author Adrian STEINER (adi.steiner@hotmail.ch)
  * @brief BaseX defined types
  * @version 0.1
  * @date 30-03-2025

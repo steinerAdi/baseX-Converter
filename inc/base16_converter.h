@@ -1,6 +1,6 @@
 /**
  * @file base16_converter.h
- * @author Adrian STEINER (steia19@bfh.ch)
+ * @author Adrian STEINER (adi.steiner@hotmail.ch)
  * @brief Converter to convert bytes to base 16 and vis-versa.
  * @version 0.1
  * @date 30-03-2025
@@ -21,8 +21,8 @@
  *
  */
 
-#ifndef BASEX_CONVERTER_H
-#define BASEX_CONVERTER_H
+#ifndef BASE16_CONVERTER_H
+#define BASE16_CONVERTER_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,4 +35,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BASEX_CONVERTER_H */
+#endif /* BASE16_CONVERTER_H */

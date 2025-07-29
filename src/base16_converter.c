@@ -1,6 +1,6 @@
 /**
  * @file base16_converter.c
- * @author Adrian STEINER (steia19@bfh.ch)
+ * @author Adrian STEINER (adi.steiner@hotmail.ch)
  * @brief Base16 byte converter.
  * @version 0.1
  * @date 17-07-2025

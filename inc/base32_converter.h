@@ -1,6 +1,6 @@
 /**
  * @file base32_converter.h
- * @author Adrian STEINER (steia19@bfh.ch)
+ * @author Adrian STEINER (adi.steiner@hotmail.ch)
  * @brief Converter to convert bytes to base 32 conversion and vis-versa.
  * @version 0.1
  * @date 30-03-2025
