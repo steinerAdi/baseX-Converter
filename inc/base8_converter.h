@@ -31,9 +31,9 @@ extern "C" {
 #include "baseX_types.h"
 #include <stdint.h>
 
-#define BASE8_BIT_LENGTH (3)
-#define BASE8_STARTCHAR ('1')
-#define BASE8_ENDCHAR ('8')
+#define BASE8_BIT_LENGTH (3)  ///< Bit length of base8 input
+#define BASE8_STARTCHAR ('1') ///< Start character of a base8 input
+#define BASE8_ENDCHAR ('8')   ///< End character of a base8 input
 
 /**
  * @brief Encodes a byte array into a base8-encoded string.

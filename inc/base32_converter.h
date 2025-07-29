@@ -31,7 +31,7 @@ extern "C" {
 #include "baseX_types.h"
 #include <stdint.h>
 
-#define BASE32_BIT_LENGTH (5)
+#define BASE32_BIT_LENGTH (5) ///< Bit length of base32 input
 
 /**
  * @brief Decodes a base32-encoded string into a byte array.

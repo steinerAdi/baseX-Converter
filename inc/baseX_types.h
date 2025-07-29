@@ -42,7 +42,7 @@ typedef enum {
   BASEX_ERROR      ///< Unexpected error
 } baseX_returnType;
 
-#define BASEX_BYTE_BIT_LENGTH (8)
+#define BASEX_BYTE_BIT_LENGTH (8) ///< Byte bit length
 
 #ifdef __cplusplus
 }
