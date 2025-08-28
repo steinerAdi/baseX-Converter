@@ -1,11 +1,12 @@
-**Release Date:** 29.07.2025
-**Tag:** v0.1.0
-**Highlights:** Update file organization, add header file for each converter
+**Release Date:** 28.08.2025
+**Tag:** v0.2.0
+**Highlights:** Add base16 converter, fix conversion errors
 
 ## Library
-- Reorganize the files into new directories
-- Add for each converter an own header file
-- Add a types base file for global defines for all converters
+- Add base16 en- and decoder including tests
+- Add -Wconversion flag to test correct casts
+- Fix cast errors in library
 
 ## Tests
-- Update the tests to the new file organization
+- Add base16 tests
+- Add additional tests to get a coverage of 100%
