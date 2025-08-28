@@ -269,21 +269,22 @@ void test_base16_decodeString(void)
 
 void test_fail_base16_encodeBytes(void)
 {
-  uint8_t decoded[BUFFER_SIZE];
-  uint32_t destLength;
-  const uint8_t *correctString = "Hello";
+  char decoded[BUFFER_SIZE];
+  const char *correctString = "Hello";
   /* Argument errors*/
   TEST_ASSERT_EQUAL_INT(BASEX_ARGUMENTS,
-                        base16_encodeBytes(NULL, BUFFER_SIZE, correctString,
-                                           strlen(correctString)));
-  TEST_ASSERT_EQUAL_INT(
-      BASEX_ARGUMENTS,
-      base16_encodeBytes(decoded, BUFFER_SIZE, NULL, strlen(correctString)));
+                        base16_encodeBytes(NULL, BUFFER_SIZE,
+                                           (const uint8_t *)correctString,
+                                           (uint32_t)strlen(correctString)));
+  TEST_ASSERT_EQUAL_INT(BASEX_ARGUMENTS,
+                        base16_encodeBytes(decoded, BUFFER_SIZE, NULL,
+                                           (uint32_t)strlen(correctString)));
 
   /* Overflow */
-  TEST_ASSERT_EQUAL_INT(
-      BASEX_OVERFLOW,
-      base16_encodeBytes(decoded, 1, correctString, strlen(correctString)));
+  TEST_ASSERT_EQUAL_INT(BASEX_OVERFLOW,
+                        base16_encodeBytes(decoded, 1,
+                                           (const uint8_t *)correctString,
+                                           (uint32_t)strlen(correctString)));
   return;
 }
 
@@ -296,8 +297,8 @@ void test_base16_encodeBytes(void)
                                              base16_data[i].byteStream,
                                              base16_data[i].length));
     TEST_ASSERT_EQUAL_CHAR_ARRAY(base16_data[i].baseAsString, encoded,
-                                 strlen(base16_data[i].baseAsString));
-    TEST_ASSERT_EQUAL_UINT32(strlen(base16_data[i].baseAsString),
+                                 (uint32_t)strlen(base16_data[i].baseAsString));
+    TEST_ASSERT_EQUAL_size_t(strlen(base16_data[i].baseAsString),
                              strlen(encoded));
   }
 }
