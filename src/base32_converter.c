@@ -151,8 +151,6 @@ baseX_returnType base32_encodeBytes(char *encodedString,
 uint8_t base32_padding(uint32_t inputLength)
 {
   switch (inputLength % 5) {
-  case 0:
-    return 0;
   case 1:
     return 6;
   case 2:
