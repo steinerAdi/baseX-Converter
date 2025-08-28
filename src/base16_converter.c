@@ -23,6 +23,9 @@
 
 #include "base16_converter.h"
 
+#include <stdio.h>
+#include <string.h>
+
 #define BASE16_CHAR_PER_BYTE (2)
 
 /**
@@ -44,23 +47,21 @@ baseX_returnType base16_decodeString(uint8_t *decodedBytes,
     return BASEX_ARGUMENTS;
   }
   uint32_t srcLength = (uint32_t)strlen(srcString);
-  if (0 == srcLength) {
+  if (0 == srcLength || (srcLength % BASE16_CHAR_PER_BYTE)) {
     return BASEX_SRCERROR;
   }
-
   *decodedLength = srcLength / BASE16_CHAR_PER_BYTE;
-
-  if (decodedLength > decodedBytesSize) {
+  if (*decodedLength > decodedBytesSize) {
     return BASEX_OVERFLOW;
   }
 
-  for (uint32_t i = 0; i < srcLength; i += 2) {
+  for (uint32_t i = 0; i < srcLength;) {
     int8_t high = hexCharToInt(srcString[i++]);
-    int8_t low = hexCharToInt(srcString[i]);
+    int8_t low = hexCharToInt(srcString[i++]);
     if (high == -1 || low == -1) {
       return BASEX_SRCERROR; // Src error, not allowed character letter
     }
-    *decodedBytes++ = (high << 4) | low;
+    *decodedBytes++ = (uint8_t)((high << 4) | low);
   }
   return BASEX_OK; // success
 }
@@ -73,16 +74,14 @@ baseX_returnType base16_encodeBytes(char *encodedString,
   if (!encodedString || !srcBytes) {
     return BASEX_ARGUMENTS;
   }
-  if (srcLength % BASE16_CHAR_PER_BYTE) {
-    return BASEX_SRCERROR;
-  }
+
   uint32_t outputLength = srcLength * BASE16_CHAR_PER_BYTE;
   if (encodedSize < (outputLength + 1)) { // +1 for null terminator
     return BASEX_OVERFLOW;
   }
   const char hexDigits[16] = "0123456789ABCDEF";
   for (uint32_t i = 0; i < srcLength; i++) {
-    char c = srcBytes[i];
+    uint8_t c = srcBytes[i];
     *encodedString++ = hexDigits[(c >> 4) & 0xF];
     *encodedString++ = hexDigits[c & 0xF];
   }

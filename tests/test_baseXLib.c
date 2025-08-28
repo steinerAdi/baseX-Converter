@@ -21,6 +21,7 @@
  *
  */
 
+#include "base16_converter.h"
 #include "base32_converter.h"
 #include "base8_converter.h"
 #include "unity.h"
@@ -74,6 +75,37 @@ baseX_testData base8_data[] = {
      .baseAsString = "636468257847848815332174",
      .baseNumerical = {5, 2, 5, 3, 5, 7, 1, 4, 6, 7, 3, 6,
                        7, 3, 7, 7, 0, 4, 2, 2, 1, 0, 6, 3}}};
+
+baseX_testData base16_data[] = {
+    {.byteStream = {'H', 'e', 'l', 'l', 'o'},
+     .length = 5,
+     .baseAsString = "48656C6C6F",
+     .baseNumerical = {4, 8, 6, 5, 6, 12, 6, 12, 6, 15}},
+    {.byteStream = {'W', 'o', 'r', 'l', 'd'},
+     .length = 5,
+     .baseAsString = "576F726C64",
+     .baseNumerical = {5, 7, 6, 15, 7, 2, 6, 12, 6, 4}},
+    {.byteStream = {'A', 'B', 'C'},
+     .length = 3,
+     .baseAsString = "414243",
+     .baseNumerical = {4, 1, 4, 2, 4, 3}},
+    {.byteStream = {0x00, 0xFF, 0x10},
+     .length = 3,
+     .baseAsString = "00FF10",
+     .baseNumerical = {0, 0, 15, 15, 1, 0}},
+    {.byteStream = {' ', '\n', '\t'},
+     .length = 3,
+     .baseAsString = "200A09",
+     .baseNumerical = {2, 0, 0, 10, 0, 9}},
+    {.byteStream = {0xDE, 0xAD, 0xBE, 0xEF},
+     .length = 4,
+     .baseAsString = "DEADBEEF",
+     .baseNumerical = {13, 14, 10, 13, 11, 14, 14, 15}},
+    {.byteStream = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0'},
+     .length = 10,
+     .baseAsString = "31323334353637383930",
+     .baseNumerical = {3, 1, 3, 2, 3, 3, 3, 4, 3, 5,
+                       3, 6, 3, 7, 3, 8, 3, 9, 3, 0}}};
 
 baseX_testData base32_data[] = {
     {
@@ -187,6 +219,88 @@ void test_base8_stringToNum(void)
                                   strlen(base8_data[i].baseAsString));
   }
 }
+void test_fail_base16_decodeString(void)
+{
+  uint8_t decoded[BUFFER_SIZE];
+  uint32_t destLength;
+  /* Argument errors*/
+  TEST_ASSERT_EQUAL_INT(BASEX_ARGUMENTS, base16_decodeString(NULL, &destLength,
+                                                             BUFFER_SIZE, "2"));
+  TEST_ASSERT_EQUAL_INT(BASEX_ARGUMENTS,
+                        base16_decodeString(decoded, NULL, BUFFER_SIZE, "2"));
+  TEST_ASSERT_EQUAL_INT(
+      BASEX_ARGUMENTS,
+      base16_decodeString(decoded, &destLength, BUFFER_SIZE, NULL));
+
+  /* Src errors */
+  TEST_ASSERT_EQUAL_INT(
+      BASEX_SRCERROR,
+      base16_decodeString(decoded, &destLength, BUFFER_SIZE, ""));
+  TEST_ASSERT_EQUAL_INT(
+      BASEX_SRCERROR,
+      base16_decodeString(decoded, &destLength, BUFFER_SIZE, "A"));
+  TEST_ASSERT_EQUAL_INT(
+      BASEX_SRCERROR,
+      base16_decodeString(decoded, &destLength, BUFFER_SIZE, "AZ"));
+  /* Overflow */
+  TEST_ASSERT_EQUAL_INT(BASEX_OVERFLOW,
+                        base16_decodeString(decoded, &destLength, 1, "AAAA"));
+  return;
+}
+
+void test_base16_decodeString(void)
+{
+  uint8_t decoded[BUFFER_SIZE];
+  uint32_t decodedLength = 0;
+  for (uint32_t i = 0; i < sizeof(base16_data) / sizeof(base16_data[0]); i++) {
+    TEST_ASSERT_EQUAL_INT(
+        BASEX_OK, base16_decodeString(decoded, &decodedLength, BUFFER_SIZE,
+                                      base16_data[i].baseAsString));
+    TEST_ASSERT_EQUAL_UINT8_ARRAY(base16_data[i].byteStream, decoded,
+                                  base16_data[i].length);
+    TEST_ASSERT_EQUAL_UINT32(base16_data[i].length, decodedLength);
+  }
+  TEST_ASSERT_EQUAL_INT(BASEX_OK, base16_decodeString(decoded, &decodedLength,
+                                                      BUFFER_SIZE, "ff"));
+  const uint8_t lowData[] = {0xff};
+  TEST_ASSERT_EQUAL_UINT8_ARRAY(lowData, decoded, 1);
+  TEST_ASSERT_EQUAL_UINT32(1, decodedLength);
+}
+
+void test_fail_base16_encodeBytes(void)
+{
+  uint8_t decoded[BUFFER_SIZE];
+  uint32_t destLength;
+  const uint8_t *correctString = "Hello";
+  /* Argument errors*/
+  TEST_ASSERT_EQUAL_INT(BASEX_ARGUMENTS,
+                        base16_encodeBytes(NULL, BUFFER_SIZE, correctString,
+                                           strlen(correctString)));
+  TEST_ASSERT_EQUAL_INT(
+      BASEX_ARGUMENTS,
+      base16_encodeBytes(decoded, BUFFER_SIZE, NULL, strlen(correctString)));
+
+  /* Overflow */
+  TEST_ASSERT_EQUAL_INT(
+      BASEX_OVERFLOW,
+      base16_encodeBytes(decoded, 1, correctString, strlen(correctString)));
+  return;
+}
+
+void test_base16_encodeBytes(void)
+{
+  char encoded[BUFFER_SIZE];
+  for (uint32_t i = 0; i < sizeof(base16_data) / sizeof(base16_data[0]); i++) {
+    TEST_ASSERT_EQUAL_INT(BASEX_OK,
+                          base16_encodeBytes(encoded, BUFFER_SIZE,
+                                             base16_data[i].byteStream,
+                                             base16_data[i].length));
+    TEST_ASSERT_EQUAL_CHAR_ARRAY(base16_data[i].baseAsString, encoded,
+                                 strlen(base16_data[i].baseAsString));
+    TEST_ASSERT_EQUAL_UINT32(strlen(base16_data[i].baseAsString),
+                             strlen(encoded));
+  }
+}
 
 void test_fail_base32_decodeString(void)
 {
@@ -277,6 +391,12 @@ int main(void)
   RUN_TEST(test_base8_decodeNum);
   RUN_TEST(test_fail_base8_stringToNum);
   RUN_TEST(test_base8_stringToNum);
+
+  // Base 16 Tests
+  RUN_TEST(test_fail_base16_decodeString);
+  RUN_TEST(test_base16_decodeString);
+  RUN_TEST(test_fail_base16_encodeBytes);
+  RUN_TEST(test_base16_encodeBytes);
 
   // Base 32 Tests
   RUN_TEST(test_fail_base32_decodeString);
