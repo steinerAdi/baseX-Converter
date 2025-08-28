@@ -109,8 +109,9 @@ baseX_returnType base32_encodeBytes(char *encodedString,
                                     uint32_t srcLength)
 {
 
-  if (!encodedString || !srcBytes)
+  if (!encodedString || !srcBytes) {
     return BASEX_ARGUMENTS;
+  }
 
   uint32_t outputLength = ((srcLength + 4) / BASE32_BIT_LENGTH) * 8;
   if (encodedSize < (outputLength + 1)) { // +1 for null terminator
@@ -150,8 +151,6 @@ baseX_returnType base32_encodeBytes(char *encodedString,
 uint8_t base32_padding(uint32_t inputLength)
 {
   switch (inputLength % 5) {
-  case 0:
-    return 0;
   case 1:
     return 6;
   case 2:

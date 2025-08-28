@@ -47,11 +47,10 @@ extern "C" {
  * @param[in] srcBytesSize Length of the input byte array in bytes.
  * @return baseX_returnType Status code.
  */
-baseX_returnType base8_encodeBytes(
-    uint8_t *encodedString,
-    uint32_t encodedStringSize,
-    const uint8_t *srcBytes,
-    uint32_t srcBytesSize);
+baseX_returnType base8_encodeBytes(uint8_t *encodedString,
+                                   uint32_t encodedStringSize,
+                                   const uint8_t *srcBytes,
+                                   uint32_t srcBytesSize);
 
 /**
  * @brief Converts a base8-encoded string into a numeric representation.
@@ -63,9 +62,7 @@ baseX_returnType base8_encodeBytes(
  * @param[in] srcString Null-terminated base8-encoded input string.
  * @return baseX_returnType Status code.
  */
-baseX_returnType base8_stringToNum(
-    uint8_t *number,
-    const char *srcString);
+baseX_returnType base8_stringToNum(uint8_t *number, const char *srcString);
 
 /**
  * @brief Decodes a base8-encoded numeric array into its original byte form.
@@ -74,18 +71,18 @@ baseX_returnType base8_stringToNum(
  * original byte array, storing the result in `decodedBytes`.
  *
  * @param[out] decodedBytes Buffer to store the decoded byte output.
- * @param[out] decodedLength Pointer to a variable that will hold the length of the decoded output.
+ * @param[out] decodedLength Pointer to a variable that will hold the length of
+ * the decoded output.
  * @param[in] decodedBytesSize Size of the output buffer in bytes.
  * @param[in] srcNumbers Input array containing base8-encoded numeric values.
  * @param[in] srcLength Length of the input numeric array.
  * @return baseX_returnType Status code.
  */
-baseX_returnType base8_decodeNum(
-    uint8_t *decodedBytes,
-    uint32_t *decodedLength,
-    uint32_t decodedBytesSize,
-    const uint8_t *srcNumbers,
-    const uint32_t srcLength);
+baseX_returnType base8_decodeNum(uint8_t *decodedBytes,
+                                 uint32_t *decodedLength,
+                                 uint32_t decodedBytesSize,
+                                 const uint8_t *srcNumbers,
+                                 const uint32_t srcLength);
 
 #ifdef __cplusplus
 }
