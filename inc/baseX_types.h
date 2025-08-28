@@ -1,7 +1,8 @@
 /**
  * @file baseX_types.h
  * @author Adrian STEINER (adi.steiner@hotmail.ch)
- * @brief BaseX defined types
+ * @brief BaseX defined types as base for converting bytes to another
+ * representation
  * @version 0.1
  * @date 30-03-2025
  *

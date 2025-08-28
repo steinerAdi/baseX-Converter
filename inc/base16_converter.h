@@ -34,14 +34,14 @@ extern "C" {
 /**
  * @brief Decodes a base16-encoded string into a byte array.
  *
- * This function decodes a base32-encoded string back into its original
+ * This function decodes a base16-encoded string back into its original
  * byte representation based on RFC3548.
  *
  * @param[out] decodedBytes Buffer to store the decoded byte array.
  * @param[out] decodedLength Pointer to store the actual number of decoded
  * bytes.
  * @param[in] decodedBytesSize Size of the output buffer in bytes.
- * @param[in] srcString NULL-terminated base32-encoded input string.
+ * @param[in] srcString NULL-terminated base16-encoded input string.
  * @param[in] srcLength the size of srcString
  * @return baseX_returnType Status code.
  */
@@ -53,11 +53,11 @@ baseX_returnType base16_decodeString(uint8_t *decodedBytes,
 /**
  * @brief Encodes a byte array into a base16-encoded string (RFC 4648).
  *
- * This function converts the input byte array into a base32-encoded string
+ * This function converts the input byte array into a base16-encoded string
  * using the standard RFC 4648 alphabet. The output string will be
  * null-terminated.
  *
- * @param[out] encodedString Buffer to store the base32-encoded string.
+ * @param[out] encodedString Buffer to store the base16-encoded string.
  * @param[in] encodedSize Size of the output buffer in bytes.
  * @param[in] srcBytes Pointer to the input byte array.
  * @param[in] srcLength Length of the input byte array in bytes.
