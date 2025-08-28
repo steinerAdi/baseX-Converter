@@ -1,11 +1,13 @@
 /**
  * @file base8_converter.c
  * @author Adrian STEINER (adi.steiner@hotmail.ch)
- * @brief Base8 byte converter with parity validation for potential padding bits.
+ * @brief Base8 byte converter with parity validation for potential padding
+ * bits.
  *
- * This module provides functionality to encode and decode byte arrays using a base8 representation.
- * It includes mechanisms to handle and verify parity bits that may be introduced due to padding,
- * ensuring data integrity during conversion.
+ * This module provides functionality to encode and decode byte arrays using a
+ * base8 representation. It includes mechanisms to handle and verify parity bits
+ * that may be introduced due to padding, ensuring data integrity during
+ * conversion.
  *
  * @version 0.1
  * @date 30-03-2025
@@ -40,19 +42,20 @@ const uint8_t baseNumberOfBits[8] = {
     3, // 111
 };
 
-baseX_returnType base8_encodeBytes(
-    uint8_t *encodedString,
-    uint32_t encodedStringSize,
-    const uint8_t *srcBytes,
-    uint32_t srcBytesSize) {
+baseX_returnType base8_encodeBytes(uint8_t *encodedString,
+                                   uint32_t encodedStringSize,
+                                   const uint8_t *srcBytes,
+                                   uint32_t srcBytesSize)
+{
   if (NULL == encodedString || NULL == srcBytes) {
     return BASEX_ARGUMENTS;
   }
 
   // Check needed length
-  uint32_t outputLength = srcBytesSize * BASEX_BYTE_BIT_LENGTH / BASE8_BIT_LENGTH;
+  uint32_t outputLength =
+      srcBytesSize * BASEX_BYTE_BIT_LENGTH / BASE8_BIT_LENGTH;
 
-  uint8_t checkBits = (srcBytesSize) % BASE8_BIT_LENGTH;
+  uint8_t checkBits = (uint8_t)(srcBytesSize % BASE8_BIT_LENGTH);
   if (checkBits) {
     outputLength++;
   }
@@ -68,9 +71,10 @@ baseX_returnType base8_encodeBytes(
   uint32_t outPos = 0;
 
   for (uint32_t srcPos = 0; srcPos < srcBytesSize; srcPos++) {
-    carry += ((((uint16_t)srcBytes[srcPos]) & UINT8_MAX) << (BASEX_BYTE_BIT_LENGTH - carryLength));
+    carry += (uint16_t)((uint16_t)(srcBytes[srcPos])
+                        << (BASEX_BYTE_BIT_LENGTH - carryLength));
     for (uint8_t i = 0; i < (2 + (carryLength ? 1 : 0)); i++) {
-      uint8_t newBase8Number = carry >> (16 - BASE8_BIT_LENGTH);
+      uint8_t newBase8Number = (uint8_t)(carry >> (16 - BASE8_BIT_LENGTH));
       numberOfBits += baseNumberOfBits[newBase8Number];
       encodedString[outPos] = newBase8Number + BASE8_STARTCHAR;
       outPos++;
@@ -84,20 +88,21 @@ baseX_returnType base8_encodeBytes(
   }
   // Add one additional number with checkBits
   if (checkBits) {
-    encodedString[outPos] = (carry >> (16 - BASE8_BIT_LENGTH)) + (numberOfBits % (2 * checkBits)) + BASE8_STARTCHAR;
+    encodedString[outPos] =
+        (uint8_t)((carry >> (uint16_t)(16 - BASE8_BIT_LENGTH)) +
+                  (numberOfBits % (2 * checkBits)) + BASE8_STARTCHAR);
     outPos++;
   }
   encodedString[outPos] = '\0';
   return BASEX_OK;
 }
 
-baseX_returnType base8_stringToNum(
-    uint8_t *number,
-    const char *srcString) {
+baseX_returnType base8_stringToNum(uint8_t *number, const char *srcString)
+{
   if (NULL == number || NULL == srcString) {
     return BASEX_ARGUMENTS;
   }
-  uint32_t srcLength = strlen(srcString);
+  uint32_t srcLength = (uint32_t)strlen(srcString);
   if (0 == srcLength) {
     return BASEX_ARGUMENTS;
   }
@@ -112,12 +117,12 @@ baseX_returnType base8_stringToNum(
   return BASEX_OK;
 }
 
-baseX_returnType base8_decodeNum(
-    uint8_t *decodedBytes,
-    uint32_t *decodedLength,
-    uint32_t decodedBytesSize,
-    const uint8_t *srcNumbers,
-    const uint32_t srcLength) {
+baseX_returnType base8_decodeNum(uint8_t *decodedBytes,
+                                 uint32_t *decodedLength,
+                                 uint32_t decodedBytesSize,
+                                 const uint8_t *srcNumbers,
+                                 const uint32_t srcLength)
+{
 
 #define NO_CHECK_BYTES (8)
 
@@ -132,7 +137,8 @@ baseX_returnType base8_decodeNum(
   }
   // Set outputlength and check overflow
 
-  uint32_t outputLength = (srcLength / NO_CHECK_BYTES * BASE8_BIT_LENGTH) + realBytes / BASE8_BIT_LENGTH;
+  uint32_t outputLength = (srcLength / NO_CHECK_BYTES * BASE8_BIT_LENGTH) +
+                          realBytes / BASE8_BIT_LENGTH;
 
   uint8_t checkBits = realBytes / BASE8_BIT_LENGTH;
 
@@ -149,14 +155,15 @@ baseX_returnType base8_decodeNum(
   uint8_t lastBitNumber = 0;
 
   for (; outPos < outputLength; outPos++) {
-    for (uint8_t i = 0; i < (BASE8_BIT_LENGTH - carryLength / 2); i++, srcPos++) {
+    for (uint8_t i = 0; i < (BASE8_BIT_LENGTH - carryLength / 2);
+         i++, srcPos++) {
       carry = carry << 3;
       lastBitNumber = (srcNumbers[srcPos] & 0x07);
       numberOfBits += baseNumberOfBits[lastBitNumber];
       carry |= lastBitNumber;
     }
-    carryLength = (carryLength + 1) % BASE8_BIT_LENGTH;
-    decodedBytes[outPos] = (carry >> carryLength);
+    carryLength = (uint8_t)((carryLength + 1) % BASE8_BIT_LENGTH);
+    decodedBytes[outPos] = (uint8_t)(carry >> carryLength) & UINT8_MAX;
     carry &= (0x3 >> (2 - carryLength));
   }
   *decodedLength = outputLength;
